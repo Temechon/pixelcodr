@@ -1,0 +1,52 @@
+.wrapper {
+
+  .menu {
+    background-color: $bg-color;
+    width: 300px;
+    position: fixed;
+    color:$text-color;
+    min-height: 100vh;
+    box-shadow: 0 2px 5px 0 rgba(0,0,0,0.16), 0 2px 10px 0 rgba(0,0,0,0.12);
+
+    .menu-content {
+      width:300px;
+      position:absolute;
+      top:50%;
+      transform:translateY(-50%);
+
+      .name {
+        font-size : 2em;
+        text-align: center;
+        text-transform: uppercase;
+        font-family: 'Montserrat', sans-serif;
+        letter-spacing: 3px;
+      }
+
+      .items {
+
+        padding-top:50px;
+
+        .item {
+          $space : 30px;
+          margin-left:30px;
+          padding: $space 0 0 $space;
+          font-family: 'Montserrat', sans-serif;
+          font-size: 1em;
+          i {
+            padding-right: 10px;
+          }
+          a {
+            color:$text-color;
+            text-decoration: none;
+            &:hover {
+              text-decoration: underline;
+              color:$text-color-activate;
+            }
+          }
+        }
+      }
+    }
+  }
+
+
+}

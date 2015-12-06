@@ -1,0 +1,14 @@
+.wrapper {
+
+  .project {
+    display :flex;
+    align-items:center;
+    font-family: "Open Sans", sans-serif;
+    border-bottom: 1px solid $text-color-activate;
+    padding: 40px 0 40px 0;
+
+    .project-text {
+      padding : 0 0 0 30px;
+    }
+  }
+}

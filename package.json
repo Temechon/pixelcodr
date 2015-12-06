@@ -1,0 +1,18 @@
+{
+  "name": "pixelcodr",
+  "version": "1.0.0",
+  "description": "Pixelcodr website",
+  "dependencies": {
+    "grunt": "latest",
+    "grunt-browser-sync": "latest",
+    "grunt-contrib-jade": "latest",
+    "grunt-contrib-sass": "latest",
+    "grunt-contrib-watch": "latest",
+    "load-grunt-tasks": "latest"
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Temechon.pixelcodr.git"
+  }
+}

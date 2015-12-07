@@ -13,7 +13,7 @@ module.exports = function (grunt) {
                 ]
             },
             jade: {
-                files  : ['jade/**/*.jade'],
+                files  : ['jade/**/**/*.jade'],
                 tasks  : [
                     'jade'
                 ]
@@ -57,7 +57,7 @@ module.exports = function (grunt) {
         },
         browserSync: {
             bsFiles: {
-                src : ['css/*.css', '*.html']
+                src : ['css/*.css', '**/**/*.html']
             },
             options: {
                 watchTask: true,

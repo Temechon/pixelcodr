@@ -1,12 +1,6 @@
 doctype html
 html(lang="en")
-    head
-        title=Pixelcodr
-        link(rel='stylesheet', href='https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css')
-        link(rel='stylesheet', href='//cdn.jsdelivr.net/flexboxgrid/6.3.0/flexboxgrid.min.css', type='text/css')
-        link(href='https://fonts.googleapis.com/css?family=Oswald',rel='stylesheet', type='text/css')
-        link(href='https://fonts.googleapis.com/css?family=Montserrat',rel='stylesheet',type='text/css')
-        link(href='https://fonts.googleapis.com/css?family=Open+Sans:300',rel='stylesheet',type='text/css')
+    include include/header.jade
         link(rel='stylesheet', href='css/main.css')
     body
 
@@ -21,12 +15,23 @@ html(lang="en")
 
                     .project
                         .img-zoom
-                            img(src="img/cover.png")
+                            img(src="img/toad_attack1.jpg")
                         .project-text
-                            h2.project-name Learning Babylon.js - 160 pages e-book
+                            h2.project-name Basics - part 1
                             .project-desc
                                 | Learn the basics of the 3D framework Babylon.js by creating a whole game. <br/>
-                                | This 160 pages e-book will teach you everything you need to know about Babylon.js to get the most out of it!
+                                | There are mushrooms !
 
                             .project-buttons
-                                a.button(target="_new", href="http://learningbabylonjs.com/") Website
+                                a.button(href="tutos/toad_attack/toad_attack.html") Go to tutorial
+                    .project
+                        .img-zoom
+                            img(src="img/toad_attack2.jpg")
+                        .project-text
+                            h2.project-name Basics - part 2
+                            .project-desc
+                                | Learn the basics of the 3D framework Babylon.js by creating a whole game. <br/>
+                                | There are more mushrooms !
+
+                            .project-buttons
+                                a.button(href="tutos/toad_attack/toad_attack-2.html") Go to tutorial

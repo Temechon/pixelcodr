@@ -1,0 +1,32 @@
+doctype html
+html(lang="en")
+    head
+        title=Pixelcodr
+        link(rel='stylesheet', href='https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css')
+        link(rel='stylesheet', href='//cdn.jsdelivr.net/flexboxgrid/6.3.0/flexboxgrid.min.css', type='text/css')
+        link(href='https://fonts.googleapis.com/css?family=Oswald',rel='stylesheet', type='text/css')
+        link(href='https://fonts.googleapis.com/css?family=Montserrat',rel='stylesheet',type='text/css')
+        link(href='https://fonts.googleapis.com/css?family=Open+Sans:300',rel='stylesheet',type='text/css')
+        link(rel='stylesheet', href='css/main.css')
+    body
+
+        .wrapper
+            //Menu
+            include include/menu.jade
+
+            // Content
+            .right-space
+                .content
+                    h1 Babylon.js tutorials
+
+                    .project
+                        .img-zoom
+                            img(src="img/cover.png")
+                        .project-text
+                            h2.project-name Learning Babylon.js - 160 pages e-book
+                            .project-desc
+                                | Learn the basics of the 3D framework Babylon.js by creating a whole game. <br/>
+                                | This 160 pages e-book will teach you everything you need to know about Babylon.js to get the most out of it!
+
+                            .project-buttons
+                                a.button(target="_new", href="http://learningbabylonjs.com/") Website

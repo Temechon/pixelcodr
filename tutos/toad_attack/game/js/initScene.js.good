@@ -1,0 +1,83 @@
+// Namespace declaration
+var TOAD_ATTACK = {};
+
+// Contains all enemies visible on screen
+TOAD_ATTACK.ENEMIES = [];
+
+// Toads names
+TOAD_ATTACK.TOADS = ["red_toad", "green_toad", "blue_toad"];
+
+// Toads prefabs storing list
+TOAD_ATTACK.TOADS_MODELS = [];
+
+// Endings storing list
+TOAD_ATTACK.ENDINGS = [];
+
+// Ending width
+TOAD_ATTACK.ENDING_WIDTH = 3;
+
+// Score
+TOAD_ATTACK.SCORE = 0;
+
+// Number of toads
+TOAD_ATTACK.TOTAL_NUMBER = 0;
+
+/**
+ * Load the scene when the canvas is fully loaded
+ */
+document.addEventListener("DOMContentLoaded", function () {
+    onload();
+}, false);
+
+
+//Initialize the Babylon engine, TOAD_ATTACK.scene, camera and light.
+var initScene = function () {
+    // ENGINE CREATION
+
+    // Get canvas
+    TOAD_ATTACK.canvas = document.getElementById("renderCanvas");
+
+    // Create babylon engine
+    TOAD_ATTACK.engine = new BABYLON.Engine(TOAD_ATTACK.canvas, true);
+
+    // Create scene
+    TOAD_ATTACK.scene = new BABYLON.Scene(TOAD_ATTACK.engine);
+    TOAD_ATTACK.scene.clearColor = new BABYLON.Color3(0.9,0.9,0.9);
+
+    // Create camera
+    TOAD_ATTACK.camera = new BABYLON.FreeCamera("camera", new BABYLON.Vector3(0,4,-10), TOAD_ATTACK.scene);
+    TOAD_ATTACK.camera.maxZ = 1200;
+    TOAD_ATTACK.camera.setTarget(new BABYLON.Vector3(0,0,10));
+
+    // Create light
+    var light = new BABYLON.PointLight("light", new BABYLON.Vector3(0,5,-5), TOAD_ATTACK.scene);
+
+    // DEBUG ONLY //
+    TOAD_ATTACK.camera.attachControl(TOAD_ATTACK.canvas);
+    axis(TOAD_ATTACK.scene, 1.0);
+    // END DEBUG //
+};
+
+
+var onload = function () {
+
+    initScene();
+
+    /// 2
+
+    TOAD_ATTACK.engine.runRenderLoop(function () {
+        TOAD_ATTACK.scene.render();
+        /// 4
+    });
+
+};
+
+/// 3
+
+/// 5
+
+/// 6
+
+/// 7
+
+/// 8

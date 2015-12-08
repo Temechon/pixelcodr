@@ -1,0 +1,387 @@
+<!DOCTYPE html><html lang="en"><head><title></title><link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css"><link rel="stylesheet" href="//cdn.jsdelivr.net/flexboxgrid/6.3.0/flexboxgrid.min.css" type="text/css"><link href="https://fonts.googleapis.com/css?family=Oswald" rel="stylesheet" type="text/css"><link href="https://fonts.googleapis.com/css?family=Montserrat" rel="stylesheet" type="text/css"><link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400" rel="stylesheet" type="text/css"><link rel="stylesheet" href="/css/main.css"></head><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.0.0/styles/zenburn.min.css"><script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.0.0/highlight.min.js"></script><script>hljs.initHighlightingOnLoad();
+</script><body><div class="wrapper"><!--Menu--><div class="menu"><div class="menu-content"><div class="name">Julian</div><div class="name">"Temechon"</div><div class="items"><div class="item"><a href="/projects.html"><i class="fa fa-gamepad"></i>Projects</a></div><div class="item"><a href="/tutorials.html"><i class="fa fa-graduation-cap"></i>Babylon.js tutorials</a></div><div class="item"><a href="https://github.com/Temechon" target="_new"><i class="fa fa-github"></i>Github</a></div><div class="item"><a href="/aboutme.html"><i class="fa fa-user"></i>About me</a></div><div class="item"><a href="http://learningbabylonjs.com/" target="_new"><i class="fa fa-rocket"></i>Learning Babylon.js</a></div></div></div></div><!-- Content--><div class="right-space"><div class="content"><h1>Toad Attack - part 2</h1><div class="tutorial">
+    <h2>Toad Attack - Build a HTML5 game with Babylon.js - part 2</h2>
+
+    <div style="text-align:center; padding-top:40px; padding-bottom: 40px">
+        <img src="/img/logos/babylonjs.png" style="max-height:75px;" />
+        <img src="/img/logos/html5.png" style="max-height:75px;" /><br/>
+    </div>
+    <p>
+        Here is the part 2 of <span class="purple">How to build a HTML5 game with Babylon.js</span>
+    </p>
+    <p>
+        If you read this, I guess you completed the <a href="toad_attack.html">part 1</a> of the tutorial, and you have a
+        basic scene ready to play with.
+    </p>
+
+    <h2>Mushrooms !</h2>
+    <p>
+        Babylon.js uses a custom JSON format to handle custom 3D models. In order to create a .babylon file,
+        you need to use a 3D modeling software, like <a href="http://www.blender.org/">Blender</a>
+        or <a href="http://www.autodesk.fr/products/3ds-max/overview">Autodesk 3D Studio Max</a>.
+        Babylon provides 2 exporters for these tools to automatically create a .babylon file (although the exporter for 3DS Max is currently in beta, it works quite
+        correctly for our needs).<br/>
+
+        As I'm a crappy graphic designer, I asked to my friend <a href="https://twitter.com/jbledowski">Jb</a> to create a 2D Toad character :
+        <a href="babylon/toad.zip">here</a> is the babylon file.<br/>
+        Now, copy your custom model <code>toad.babylon</code> and all its textures in the folder <code>assets</code> or our game, and let's summon it in our game !
+    </p>
+
+    <h2>Importing a custom 3D model</h2>
+    <p>
+        Once again, Babylon is very easy to use. Add this code in the <code>initGame</code> function :
+    <pre><code class="js">// The function ImportMesh will import our custom model in the scene given in parameter
+BABYLON.SceneLoader.ImportMesh("red_toad", "assets/", "toad.babylon", scene, function (meshes) {
+    var m = meshes[0];
+    m.isVisible = false;
+    m.scaling = new BABYLON.Vector3(0.5,0.5,0.5);
+    TOAD_MODEL = m;
+});</code></pre>
+
+    Let me eplain more precisely what we are doing here. The function <code>BABYLON.SceneLoader.ImportMesh</code> takes 5 parameters :
+    <ul>
+        <li><span class="purple">red_toad</span> - The name of the object you want to import. Your babylon file may contain several differents objects,
+            and this parameter is here to specify to the engine <i>I only want this object please</i>. If you want to load all of them, just set an empty string.</li>
+        <li><span class="purple">assets/</span> - The folder where your babylon file is.</li>
+        <li><span class="purple">toad.babylon</span> - The babylon file name to import</li>
+        <li><span class="purple">scene</span> - The scene where our model will be imported</li>
+        <li><span class="purple">function(meshes) {}</span> - A callback function called when the model is loaded in the scene.
+            The parameter of the function represents all meshes loaded (in our case, only one). Without this parameter,
+        the model is loaded in (0,0,0), and... that's pretty all.</li>
+    </ul>
+<pre><code class="js">var m = meshes[0];
+m.isVisible = false;
+m.scaling = new BABYLON.Vector3(0.5,0.5,0.5);
+TOAD_MODEL = m;
+</code></pre>
+
+    In the callback function, I want to set invisible my model, as it will be a template to generate all other toad.
+    My friend gave me a bigger toad that I would like, so I decrease its size by 2 with a simple scaling.
+    The last line is here to save my mesh as a global variable to reuse it later.
+    </p>
+
+    <h2>More mushrooms !</h2>
+    <p>
+        Now, our template is loaded, let's create a function to clone our template and display it on one of our lane choosen randomly. <br/>
+        Copy this function at the end of <code>initGame</code> :
+        <pre><code class="js">var ENEMIES  = [];
+// Creates a shroom in a random lane
+var createEnemy = function () {
+    // The starting position of toads
+    var posZ = 100;
+
+    // Get a random lane
+    var posX = LANES_POSITIONS[Math.floor(Math.random() * LANE_NUMBER)];
+
+    // Create a clone of our template
+    var shroom = TOAD_MODEL.clone(TOAD_MODEL.name);
+
+    shroom.id = TOAD_MODEL.name+(ENEMIES.length+1);
+    // Our toad has not been killed yet !
+    shroom.killed = false;
+    // Set the shroom visible
+    shroom.isVisible = true;
+    // Update its position
+    shroom.position = new BABYLON.Vector3(posX, shroom.position.y/2, posZ);
+    ENEMIES.push(shroom);
+};
+
+// Creates a clone every 1 seconds
+setInterval(createEnemy, 1000);</code></pre>
+        With this, one shroom will be created every seconds on a random lane. Try it, you should see several mushrooms created at the end of our lanes
+     - the dark side of the game :).
+    </p>
+    <div class="centerImg"><img src="img/toad_attack3.png"/></div>
+
+    <h2>You gotta move like Jagger</h2>
+
+    <p>
+        Our mushrooms should move along their lane, but nothing happens...
+        To do that, we will need to update the <code>render</code> function of our engine, like this :
+
+        <pre><code class="js">engine.runRenderLoop(function () {
+    scene.render();
+    ENEMIES.forEach(function (shroom) {
+        if (shroom.killed) {
+            // Nothing to do here
+        } else {
+            shroom.position.z -= 0.5;
+        }
+    });
+});</code></pre>
+
+        This code can be translated like this : for each created toad, if he's not killed, move it of 0.5 units on the z-axis.
+    Try it !
+    </p>
+    <div class="centerImg"><img src="img/toad_attack4.png" /></div>
+
+    <h2>Textures and materials</h2>
+<p>
+    Our game is very simplistic at the moment. Let's change that !
+    First, we should update the material used for the lane, with a texture. Save <a href="img/ground.jpg">this ground texture</a> in the <code>assets</code> folder, and add these lines in the
+    <code>initGame</code> function :
+    <pre><code class="js">var ground = new BABYLON.StandardMaterial("ground", scene);
+var texture = new BABYLON.Texture("assets/ground.jpg", scene);
+texture.uScale = 40;
+texture.vScale = 2;
+ground.diffuseTexture = texture;    </code></pre>
+    A <code>BABYLON.Texture</code> is created,
+    and as our lane was scaled along the z-axis, we need to update its UV scale.
+    The texture is then applied to a <code>StandardMaterial</code>.<br/>
+    To apply the material, just add this line in the function <code>createLane</code>.
+<pre><code class="js">lane.material = ground;</code></pre>
+
+    <h2>Skybox</h2>
+The color purple is the base color (called clear color) of a new BABYLON.Scene. In order to have a sky, we have to add a skybox !
+    Save <a href="img/cubemap.zip">this skybox </a>in your <code>assets</code>
+    folder and add these lines in the <code>initScene</code> function :
+
+        <pre><code class="js">// The box creation
+var skybox = BABYLON.Mesh.CreateBox("skyBox", 100.0, scene);
+
+// The sky creation
+var skyboxMaterial = new BABYLON.StandardMaterial("skyBox", scene);
+skyboxMaterial.backFaceCulling = false;
+skyboxMaterial.diffuseColor = new BABYLON.Color3(0, 0, 0);
+skyboxMaterial.specularColor = new BABYLON.Color3(0, 0, 0);
+skyboxMaterial.reflectionTexture = new BABYLON.CubeTexture("assets/cubemap/skybox", scene);
+skyboxMaterial.reflectionTexture.coordinatesMode = BABYLON.Texture.SKYBOX_MODE;
+
+// box + sky = skybox !
+skybox.material = skyboxMaterial;</code></pre>
+
+    The skybox is a set of 6 textures having the same name (<code>skybox</code> here)
+    with different extensions (<code>_nx, _ny, _nz, _px, _py, _pz</code>) in a folder (<code>assets/cubemap</code>).
+</p>
+
+    <div class="centerImg"><img src="img/toad_attack5.png" /></div>
+
+    <h2>Mushroom death</h2>
+
+    <p>
+        We saw how to <i>create</i> toads, but not how to destroy them !
+        The logic here is to destroy a clone if its position is behind the camera. Easy, right ? :)
+
+<pre><code class="js">function cleanShrooms() {
+    // For all clones
+    for (var n=0; n&lt;ENEMIES.length; n++) {
+        if (ENEMIES[n].position.z &lt; -10) {
+            var shroom = ENEMIES[n];
+            // Destroy the clone !
+            shroom.dispose();
+            ENEMIES.splice(n, 1);
+            n--;
+        }
+    }
+}</code></pre>
+
+    Can you guess where this function should be called ? Yes ! In the <code>render</code> function !
+    Just add this :
+<pre><code class="js">cleanShrooms(); </code></pre>
+    </p>
+
+    <h2>Basic animations</h2>
+    <p>
+        There are 2 kinds of animations : simple animations, that can be handled in the render function
+        (like a mushrooms walking along a lane), and complex animations.<br/>
+        Babylon use an object called <code>BABYLON.Animation</code> linked to a mesh to create a complex animation.
+        Let's try it !
+    </p>
+
+    <p>
+        Let's create a function adding an animation to a mesh given in parameter. Our animation will make
+        the mesh go along the y-axis and back to its original position:
+<pre><code class="js">function animateEnding (ending) {
+    // Get the initial position of our mesh
+    var posY = ending.position.y;
+    // Create the Animation object
+    var animateEnding = new BABYLON.Animation(
+    "animateEnding",
+    "position.y",
+    60,
+    BABYLON.Animation.ANIMATIONTYPE_FLOAT,
+    BABYLON.Animation.ANIMATIONLOOPMODE_RELATIVE);
+
+    // Animations keys
+    var keys = [];
+    keys.push({
+        frame: 0,
+        value: posY
+    },{
+        frame: 5,
+        value: posY+0.5
+    },{
+        frame: 10,
+        value: posY
+    });
+
+    // Add these keys to the animation
+    animateEnding.setKeys(keys);
+
+    // Link the animation to the mesh
+    ending.animations.push(animateEnding);
+
+    // Run the animation !
+    scene.beginAnimation(ending, 0, 10, false, 1);
+
+}</code></pre>
+    </p>
+
+<p>
+    The <code>Animation</code> object takes 5 parameters :
+    <ul>
+        <li><span class="purple">animateEnding</span> - The animation name</li>
+        <li><span class="purple">position.y</span> - The attribute this animation will change</li>
+        <li><span class="purple">60</span> - The number of frame per second. We want this animation to run at 60 FPS</li>
+        <li><span class="purple">BABYLON.Animation.ANIMATIONTYPE_FLOAT</span> - The type of the attribute this animation will change</li>
+        <li><span class="purple">BABYLON.Animation.ANIMATIONLOOPMODE_RELATIVE</span> - The behaviour of this animation. Here, the animation will takes a previous value and increment it.</li>
+    </ul>
+    Several parameters can change the behaviour of the animation, don't hesitate to modify these value to
+    see what's going on.
+    <pre><code class="js">// Animations keys
+var keys = [];
+keys.push({
+    frame: 0,
+    value: posY
+},{
+    frame: 5,
+    value: posY+0.5
+},{
+    frame: 10,
+    value: posY
+});</code></pre>
+    The object <code>keys</code> of the animation basically says :
+    <ul>
+        <li>At the frame 0, the parameter <code>position.y</code> of our mesh will be at its initial position <code>posY</code></li>
+        <li>At the frame 5, the parameter <code>position.y</code> of our mesh will be at the position <code>posY+0.5</code></li>
+        <li>At the frame 10, the parameter <code>position.y</code> of our mesh will be back at its initial position <code>posY</code></li>
+    </ul>
+</p>
+<p>
+    Finally, the animation is attached to the mesh :
+    <pre><code class="js">// Link the animation to the mesh
+ending.animations.push(animateEnding);
+// Run the animation !
+scene.beginAnimation(ending, 0, 10, false, 1);
+    </code></pre>
+
+    <code>scene.beginAnimation</code> takes the mesh linked to the animation, the first frame and the last frame (<code>0</code> and <code>10</code>) : this means
+    our animation will last 10 frames.
+</p>
+<p>
+    Now, time to run launch our animation with a keyboard event !
+</p>
+<h2>Keyboard event</h2>
+    <p>
+        We want to detect 3 keys : 'A', 'Z' and 'E', each key controlling one different lane (thus one red ending for each key).
+<pre><code class="js">function onKeyDown(evt) {
+    var currentEnding = -1;
+    switch (evt.keyCode) {
+        case 65 : //'A'
+            currentEnding = 0;
+            break;
+        case 90 : //'Z'
+            currentEnding = 1;
+            break;
+        case 69 : //'E'
+            currentEnding = 2;
+            break;
+    }
+    if (currentEnding != -1) {
+        // ANIMATE !!
+        animateEnding(ENDINGS[currentEnding]);
+
+        // getToadOnEnding...
+    }
+}
+</code></pre>
+Let's bind this function to the <code>keydown</code> event :
+<pre><code class="js">window.addEventListener("keydown", onKeyDown);</code></pre>
+
+    Each time you press on 'A', 'Z' or 'E', the animation is launched ! Yeah !<br/>
+    Our function is now called when a key is pressed, but we would like to detect if a mushroom is present on the ending.
+    In this case, the mushroom will be killed.<br/>
+    But first things first, let's create a function to detect if one toad is on one of the ending. There are several solutions
+    for that, but I choose the easy one :)<br/>
+
+    <pre><code class="js">// Function checking if a shroom is present on a given ending
+function getToadOnEnding(ending) {
+    // for each mushroom
+    for (var i=0; i&lt;ENEMIES.length; i++){
+        var shroom = ENEMIES[i];
+        // Check if the shroom is on the good lane
+        if (shroom.position.x === ending.position.x) {
+
+            // Check if the shroom is ON the ending
+            var diffSup = ending.position.z + 3;
+            var diffInf = ending.position.z - 3;
+
+            if (shroom.position.z &gt; diffInf && shroom.position.z &lt; diffSup ) {
+                return shroom;
+            }
+        }
+    }
+    return null;
+}</code></pre>
+    </p>
+<p>
+    And now, let's complete the end of our function <code>onKeyDown</code> :
+    <pre><code class="js">if (currentEnding != -1) {
+    animateEnding(ENDINGS[currentEnding]);
+    var shroom = getToadOnEnding(ENDINGS[currentEnding]);
+    if (shroom) {
+        // Kill !
+        shroom.killed = true;
+    }
+}</code></pre>
+</p>
+
+<h2>One...more...thing !</h2>
+<p>The last thing to is to update our method (<code>cleanShrooms</code>) to delete the killed shroom and
+    add a point to the final score :
+<pre><code class="js">function cleanShrooms() {
+    // For all clones
+    for (var n=0; n&lt;ENEMIES.length; n++) {
+        // The mushrooms has been killed !
+        if (ENEMIES[n].killed) {
+            var shroom = ENEMIES[n];
+            // Destroy the clone !
+            shroom.dispose();
+            ENEMIES.splice(n, 1);
+            n--;
+            // Add one point to the score
+            score += 1;
+        }
+        // The mushrooms is behind the camera
+        else if (ENEMIES[n].position.z &lt; -10) {
+            var shroom = ENEMIES[n];
+            // Destroy the clone !
+            shroom.dispose();
+            ENEMIES.splice(n, 1);
+            n--;
+            // Remove one point to the score
+            score -= 1;
+        }
+    }
+}</code></pre>
+</p>
+
+    <h2>What's next ?</h2>
+<p>
+    And that's it ! You have finished your first basic game with Babylon.js! Congratulations :)<br/>
+    <span class="purple">Click on the image below to get the final code source</span> if you want to take a look at it. I updated/add several things in it, but feel free to
+    modify it as you wish.<br/>
+    <div class="centerImg" style="padding:0">
+        <a href="zip/toad_attack.zip">
+            <img class="shadow" src="img/games.png" style="width:150px"/>
+        </a>
+    </div>
+</p><p>
+    <br/>If you think this tutorial helped you in any way whatsoever, my goal has been reached, and I'm happy :)
+    If you have any questions about it, feel free to email me at <span class="purple">temechon <code>[at]</code> pixelcodr <code>[dot]</code> com</span>, or leave a comment below,
+        I'll answer quickly. <br/><br/>You can also <a href="http://eepurl.com/ZlBTX">subscribe to the newsletter</a> and you will receive an email when a new tutorial is out. No spam, and unsubscribe whenever you want.
+        <br/><br/>
+        Cheers !
+    </p>
+</p>
+</div></div></div></div></body></html>

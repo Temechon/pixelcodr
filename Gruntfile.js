@@ -6,6 +6,10 @@ module.exports = function (grunt) {
     grunt.initConfig({
         //watches content related changes
         watch        : {
+            html: {
+                files : ['content/**/*'],
+                tasks : ['jade']
+            },
             sass: {
                 files  : ['sass/**/*.scss'],
                 tasks  : [
@@ -13,7 +17,7 @@ module.exports = function (grunt) {
                 ]
             },
             jade: {
-                files  : ['jade/**/**/*.jade'],
+                files  : ['jade/**/*.jade'],
                 tasks  : [
                     'jade'
                 ]
@@ -22,13 +26,15 @@ module.exports = function (grunt) {
         // Jade compil
         jade : {
             compile: {
-                files: [{
+                files: [
+                {
                     expand: true,
                     cwd: "./jade",
                     src: ["**/*.jade", "!tutos", "!include/*"],
                     dest: ".",
                     ext: ".html"
-                }, {
+                },
+                    {
                     expand: true,
                     cwd: "./jade/tutos",
                     src: ["**/*.jade"],

@@ -13,13 +13,17 @@ $text-color:#E5EFF1;
 $text-color-activate:#579DD9;
 $button-color:#777;
 
+$font-title:'Montserrat', sans-serif;
+$font-text:"Open Sans", sans-serif;
+
 
 @import "menu";
 @import "projects";
+@import "tutorials";
 
 h1 {
   line-height: 1.25;
-  font-family: 'Montserrat', sans-serif;
+  font-family: $font-title;
   border-bottom: 1px solid $text-color-activate;
   padding-bottom: 30px;
   margin-bottom: 60px;

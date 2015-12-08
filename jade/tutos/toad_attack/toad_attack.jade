@@ -1,42 +1,21 @@
 doctype html
 html(lang="en")
     include ../../include/header.jade
-        link(rel='stylesheet', href='../../css/main.css')
-        link(rel='stylesheet', href='https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.0.0/styles/zenburn.min.css')
-        script(src='https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.0.0/highlight.min.js')
-        script.
-            hljs.initHighlightingOnLoad();
+    link(rel='stylesheet', href='https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.0.0/styles/zenburn.min.css')
+    script(src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.0.0/highlight.min.js")
+    script.
+        hljs.initHighlightingOnLoad();
+
     body
+
         .wrapper
             //Menu
             include ../../include/menu.jade
-                // Content
+
+            // Content
             .right-space
                 .content
-                    h1 Toad Attack !
+                    h1 Toad Attack - part 1
 
-                    p
-                        a(href='http://www.babylonjs.com/') Babylon.js
-                        |  is a 3D game engine based on WebGL and javascript, created by David Catuhe and David Rousset. <br/>
-                        | This engine is relatively new and less popular than Three.js, but many think
-                        | it is easier to understand and easier to manipulate.
-                        | Moreover, it is completely open source (with a very reactive community) and game oriented,
-                        | with several features built specifically for games, like
-                        i.
-                            gamepad camera
-                        | ,
-                        i.
-                            hardware accelerated instances,
-                        |  and so on.
-                        br
-                        |         The complete list of feature is described on the
-                        a(href='https://github.com/BabylonJS/Babylon.js') Github page
-                        |  of the project.
-                        br
-                        |         With this framework, you can build games
-                        a(href='http://race.assassinscreedpirates.com/') like this one
-                        | , based on the popular licence
-                        span.purple Assasin&apos;s creed
-                        | .
+                    include ../../../content/tutos/toad_attack.html
 
-                

@@ -1,0 +1,516 @@
+<div class="tutorial">
+    <h2>Plane - How to use Actions and ActionManager </h2>
+
+    <div style="text-align:center; padding-top:40px; padding-bottom: 40px">
+        <img src="../../images/logos/babylonjs.png" style="max-height:75px;" />
+        <img src="../../images/logos/html5.png" style="max-height:75px;" /><br/>
+    </div>
+    <p>
+
+    </p>
+    <p>
+        To understand this tutorial, you should have some experience with Babylon.js or completed my
+        <a href="../toad_attack/toad_attack.html">first tutorial</a>.
+    </p>
+
+    <h2>Objective</h2>
+    <p>
+        In this tutorial, we will try to use a notion created recently (last stable version 1.12) : Actions !<br/>
+        Actions are a simple way to interact with your scene, and are launched by a trigger. With this new system,
+        we will try to create a simple game prototype called
+        <a href="game/index.html">PLANE - click here to run the game</a>. <br/>
+        Let's start !
+    </p>
+
+    <h2>What you will create</h2>
+
+    <div class=" centerImg centerImgBig">
+        <a href="game/index.html"><img src="img/final.png" /></a>
+    </div>
+
+    <p>
+        Plane is a game prototype with the following features :
+        <ul>
+            <li>You control a ship (well... a box, but try to picture it, ok ?), and two movements are available : left and right.</li>
+            <li>The ship is always going forward</li>
+            <li>Buildings are randomly created in front of the ship</li>
+            <li>If the ship collides with one building, the game is over</li>
+            <li>The player can click on one building to destroy it, but it consumes one bullet</li>
+        </ul>
+    If you want, you can download my <a href="../start_babylon/start_project.zip">Babylon starting project</a>, or start from
+    scratch, but I will only describe the javascript part here. <br/>
+
+    Ready ? Let's start :)
+    </p>
+
+    <h2>Preparing the scene</h2>
+    As usual, the <code>onload</code> function is launched when the DOM is fully loaded.
+    <pre><code class="js">
+// The babylon engine
+var engine;
+// The current scene
+var scene;
+// The HTML canvas
+var canvas;
+// The camera, the ship and the ground will move
+var camera, ship, ground;
+
+// The function onload is loaded when the DOM has been loaded
+    document.addEventListener("DOMContentLoaded", function () {
+    onload();
+}, false);
+
+/**
+* Onload function : creates the babylon engine and the scene
+*/
+var onload = function () {
+    // Engine creation
+    canvas = document.getElementById("renderCanvas");
+    engine = new BABYLON.Engine(canvas, true);
+
+    // Scene creation
+    initScene();
+
+    // The render function
+    engine.runRenderLoop(function () {
+        // Nothing to right now except rendering the scene
+        scene.render();
+    });
+};
+    </code></pre>
+
+    And here is the function <code>initScene</code>:
+    <pre><code class="js">
+var initScene = function() {
+    // The scene creation
+    scene = new BABYLON.Scene(engine);
+
+    // The camera creation
+    camera = new BABYLON.FreeCamera("Camera", new BABYLON.Vector3(0, 5, -30), scene);
+    camera.setTarget(new BABYLON.Vector3(0,0,20));
+    camera.maxZ = 1000;
+    camera.speed = 4;
+
+    // Hemispheric light to enlight the scene
+    var h = new BABYLON.HemisphericLight("hemi", new BABYLON.Vector3(0, 0.5, 0), scene);
+    h.intensity = 0.6;
+
+    // A directional light to add some colors
+    var d = new BABYLON.DirectionalLight("dir", new BABYLON.Vector3(0,-0.5,0.5), scene);
+    d.position = new BABYLON.Vector3(0.1,100,-100);
+    d.intensity = 0.4;
+    // Purple haze, all around !
+    d.diffuse = BABYLON.Color3.FromInts(204,196,255);
+
+    // ground
+    ground = BABYLON.Mesh.CreateGround("ground", 800, 2000, 2, scene);
+
+    // ship
+    ship = new Ship(1, scene);
+};
+    </code></pre>
+
+    Let's slow down for a minute and explain all of this. First, the engine and
+    the main camera are created (see <a href="../toad_attack/toad_attack.html">first tutorial part 1</a>).
+    The target of the camera is set to the horizon (don't forget the z-axis is in front of us, and the x-axis is along your left hand),
+    and its range is set to 1000 units.<br/>
+    The hemispheric light will play the part of our sun by enlighting the whole scene. A directional light is added to give some pastel colors
+    to our prototype (purple everywhere !).<br/><br/>
+    Ok, you know all of that. But what the hell is a <b>ship</b> ?
+
+    <h2>Ladies and gentlemen : the ship !</h2>
+<p>
+
+    The ship will be a custom class extending the class BABYLON.Mesh, and will represents the player in our game.<br/>
+    To create a ship, let's start by creating a new javascript file (in your <code>js</code> folder) called <code>Ship.js</code>.
+    Don't forget to add it in your HTML file, otherwise an error <code>undefined is not a function</code> will be raised.
+    </p>
+    <p>
+    Let's look at the code of the <code>Ship.js</code> file :
+
+        <pre><code class="js">
+/**
+* A mesh representing the player ship
+* @param size The ship size
+* @param scene The scene where the ship will be created
+* @constructor
+*/
+Ship = function(size, scene) {
+    // Call the super class BABYLON.Mesh
+    BABYLON.Mesh.call(this, "ship", scene);
+    // Creates a box (yes, our ship will be a box)
+    var vd = BABYLON.VertexData.CreateBox(size);
+    // Apply the box shape to our mesh
+    vd.applyToMesh(this, false);
+
+    // To be continued...
+};
+
+// Our object is a BABYLON.Mesh
+Ship.prototype = Object.create(BABYLON.Mesh.prototype);
+// And its constructor is the Ship function described above.
+Ship.prototype.constructor = Ship;
+        </code></pre>
+
+    The <code>Ship</code> function is our constructor, the function called when our ship is created in our scene.
+    In this constructor, the super constructor of BABYLON.Mesh is called : that way, our ship <span class="purple">extends</span> a Mesh.
+    Then, we create a box and apply this box shape to our mesh.<br/>
+    Now, we will add some parameters specific to our game.
+    </p>
+
+<p>
+    Add this in our Ship constructor :
+    <pre><code class="js">
+// Our ship is all fresh (for now)
+this.killed = false;
+// It has 3 bullets to destroy buildings
+this.ammo = 3;
+
+// Its position is in (0,0), and a little bit above the ground.
+this.position.x = 0;
+this.position.z = 0;
+this.position.y = size/2;
+
+// Movement attributes
+this.speed = 3;
+this.moveLeft = false;
+this.moveRight = false;
+
+// To be continued....
+    </code></pre>
+
+    Nothing really difficult to understand here, isn't it ? Cool :) <br/>
+    Now you know what is a ship, let's go back to our scene. By the way, did you try to run your game in a browser ? Here is what it looks like :
+    <div class="centerImg"><img src="img/plane01.png" /></div>
+</p>
+
+    <h2>The ammunition label</h2>
+
+    <p>
+        We need the player to see how much ammunition he has. To do this, we will add the amount of remaining bullets
+        in the HTML page, like this :
+
+        <pre><code class="html">
+&lt;body&gt;
+    &lt;canvas id=&quot;renderCanvas&quot;&gt;&lt;/canvas&gt;
+    &lt;div id=&quot;ammoLabel&quot;&gt;AMMO : 3&lt;/div&gt;
+&lt;/body&gt;
+        </code></pre>
+    And with a little bit of CSS :
+    <pre><code class="css">
+#ammoLabel {
+    position:absolute;
+    top:20px;
+    left : 20px;
+    color:white;
+    font-size: 2em;
+}
+    </code></pre>
+    The bullets number is now added in our game ! Yeah ! We will make it dynamic later, don't worry.<br/>
+    </p>
+
+    <h2>It is moving !</h2>
+
+    <p>Right now, our ship is a little bit static. We want the player to be able to move it to the left
+    and to the right. Let's change that by adding a private method in our <code>Ship</code> class.
+<pre><code class="js">
+Ship.prototype._initMovement = function() {
+
+    // When a key is pressed, set the movement
+    var onKeyDown = function(evt) {
+        // To the left
+        if (evt.keyCode == 37) {
+            ship.moveLeft = true;
+            ship.moveRight = false;
+        } else if (evt.keyCode == 39) {
+            // To the right
+            ship.moveRight = true;
+            ship.moveLeft = false;
+        }
+    };
+
+    // On key up, reset the movement
+    var onKeyUp = function(evt) {
+        ship.moveRight = false;
+        ship.moveLeft = false;
+    };
+
+    // Register events with the right Babylon function
+    BABYLON.Tools.RegisterTopRootEvents([{
+        name: "keydown",
+        handler: onKeyDown
+    }, {
+        name: "keyup",
+        handler: onKeyUp
+    }]);
+};
+</code></pre>
+    Usually, privates methods in Javscript starts with an underscore, so I did the same here. Two functions are defined, and are linked
+    to events <code>keydown</code> and <code>keyup</code>. You can use the method <code>BABYLON.Tools.UnregisterTopRootEvents</code>
+    to unregister your functions if you need it.
+    </p>
+
+    <p>
+    Now, we need to add a <code>move</code> function to our ship. The move function will move the camera and the ship to
+    make things easier to understand.<br/>
+
+<pre><code class="js">
+Ship.prototype.move = function() {
+    if (ship.moveRight) {
+        ship.position.x += 1;
+        camera.position.x += 1;
+    }
+    if (ship.moveLeft) {
+        ship.position.x += -1;
+        camera.position.x += -1;
+    }
+};
+</code></pre>
+    Only the x position of the ship is updated here.
+    </p>
+    <p>
+        Finally, we need to update the render method to call this function if the player is not killed :
+
+<pre><code class="js">
+// The render function
+engine.runRenderLoop(function () {
+    if (! ship.killed) {
+        ship.move();
+
+        camera.position.z += ship.speed;
+        ship.position.z += ship.speed;
+        ground.position.z += ship.speed;
+    }
+    scene.render();
+});
+</code></pre>
+
+    In the render function, the ground, the camera and the ship will always move along the z-axis. To the infinity and beyond !
+    </p>
+
+    <p>
+        What you may ask, is why use boolean values for moveLeft and moveRight instead of incrementing directly the
+        ship x-position. Well, you can try, but you will see that the render function is much more executed than the
+        event 'keydown' and 'keyup' are fired. By doing this way, the movement is much more smoother.
+    </p>
+
+
+<h2>Building generation</h2>
+
+    <p>
+        Our buildings will be boxes, in which several actions will be attached. Let's create a function called <code>box</code>.
+        This function will generate a box with a random size at a random position :
+        <pre><code class="js">
+/**
+ * Stolen from the babylon source code
+ */
+var randomNumber = function (min, max) {
+    if (min == max) {
+        return (min);
+    }
+    var random = Math.random();
+    return ((random * (max - min)) + min);
+};
+
+var box = function() {
+    var minZ = camera.position.z+500;
+    var maxZ = camera.position.z+1500;
+    var minX = camera.position.x - 100, maxX = camera.position.x+100;
+    var minSize = 2, maxSize = 10;
+
+    var randomX, randomZ, randomSize;
+
+    randomX = randomNumber(minX, maxX);
+    randomZ = randomNumber(minZ, maxZ);
+    randomSize = randomNumber(minSize, maxSize);
+
+    var b = BABYLON.Mesh.CreateBox("bb", randomSize, scene);
+
+    b.scaling.x = randomNumber(0.5, 1.5);
+    b.scaling.y = randomNumber(4, 8);
+    b.scaling.z = randomNumber(2, 3);
+
+    b.position.x = randomX;
+    b.position.y = b.scaling.y/2 ;
+    b.position.z = randomZ;
+
+    // To be continued
+};
+
+        </code></pre>
+ Now, we want to add two actions :
+    <ul>
+        <li>When the player collides with one building, the ship is <b>killed</b></li>
+        <li>When the player clicks on one building, and if he has at least one ammo, the building dissapears and the number of ammo decreases</li>
+    </ul>
+It is easy to do it with the <b>Action system</b> of Babylon.
+    </p>
+
+    <h2>Actions and ActionManager</h2>
+    <p>
+        In the wonderful Babylon world, an <span class="purple">action</span> can be launched by a <span class="purple">trigger</span> with a <span class="purple">condition</span>.
+        There are 3 kind of triggers right now (several triggers linked to the keyboard are being developped):
+        <ul>
+            <li>An intersection between two meshes</li>
+            <li>A click on a mesh (left click, right click, middle click)</li>
+            <li>A pointer over a mesh</li>
+        </ul>
+
+        There are several kind of actions, and in bold are the one we will implement in this tutorial:
+    <ul>
+        <li>The values actions:</li>
+        <ul>
+            <li><b>SwitchBooleanAction</b></li>
+            <li>SetValueAction</li>
+            <li><b>IncrementValueAction</b></li>
+            <li>InterpolateValueAction</li>
+            <li>SetParentAction</li>
+        </ul>
+        <li>The animations actions:</li>
+        <ul>
+            <li>PlayAnimationAction</li>
+            <li>StopAnimationAction</li>
+        </ul>
+        <li>The custom actions:</li>
+        <ul>
+            <li>CombineAction</li>
+            <li><b>ExecuteCodeAction</b></li>
+        </ul>
+    </ul>
+
+    And only 3 kinds of Conditions are available for now:
+    <ul>
+        <li>ValueCondition</li>
+        <li>PredicateCondition</li>
+        <li>StateCondition</li>
+    </ul>
+
+    All actions, triggers and conditions are described <a href="https://github.com/BabylonJS/Babylon.js/wiki/How-to-use-Actions">here.</a>
+    Don't hesitate to take a look at it before continuing.
+    </p>
+
+    <h2>One action to rule them all</h2>
+    <p>
+        The next feature to implement is this one : "If the ship collides with one building, the game is over".<br/>
+        So, let's start by defining a new intersection trigger. Add these lines in the <code>box</code> function :
+
+        <pre><code class="js">
+// We must create a new ActionManager for our building in order to use Actions.
+b.actionManager = new BABYLON.ActionManager(scene);
+
+// The trigger is OnIntersectionEnterTrigger
+var trigger = {trigger:BABYLON.ActionManager.OnIntersectionEnterTrigger, parameter: ship};
+        </code></pre>
+
+    Here, a trigger is an object with 2 parameter : the kind of trigger used, and the object this building will collide with (the ship).
+    Easy right ? Now, let's switch our ship attribute <code>killed</code> to true when the collision is done.
+    <pre><code class="js">
+// Our first action !
+var sba = new BABYLON.SwitchBooleanAction(trigger, ship, "killed");
+b.actionManager.registerAction(sba);
+    </code></pre>
+    We create a new SwitchBooleanAction with the trigger. The two last parameters are the boolean attribute to switch (killed) and the
+    object containing this attribute (the ship).
+    </p>
+    <p>
+        To try it, add this function in your scene initialization :
+    <pre><code class="js">
+setInterval(box, 100);
+    </code></pre>
+    This will create a new box every 100ms, adjust this value as you wish. You can try to run the game now, and do not hesitate to
+    crash in one of the building :)
+    </p>
+
+    <h2>One action to find them</h2>
+    <p>
+        The next feature to implement is this one : <code>The player can click on one building to destroy it, but it consumes one bullet</code>.
+        We will add a <code>OnPickTrigger</code>, and add a custom action <code>ExecuteCodeAction</code>, but first, we need to check
+        if the player has at least one bullet, with a <code>Condition</code> :
+
+<pre><code class="js">
+// condition : ammo > 0
+var condition = new BABYLON.ValueCondition(b.actionManager, ship, "ammo", 0, BABYLON.ValueCondition.IsGreater);
+</code></pre>
+    Our condition takes our object and the attribute to test (ammo), and the operator (<code>IsGreater</code>) and the value to compare with (0).
+<pre><code class="js">
+var onpickAction = new BABYLON.ExecuteCodeAction(
+    BABYLON.ActionManager.OnPickTrigger,
+    function(evt) {
+        if (evt.meshUnderPointer) {
+            // Find the clicked mesh
+            var meshClicked = evt.meshUnderPointer;
+            // Detroy it !
+            meshClicked.dispose();
+            // Reduce the number of ammo by one
+            ship.ammo -= 1;
+            // Update the ammo label
+            ship.sendEvent();
+        }
+    },
+    condition);
+
+b.actionManager.registerAction(onpickAction);
+</code></pre>
+Instead of a condition, we could have add a <code>if</code> statement in our action, but it would be less fun :)
+    </p>
+
+    <p>And that's all for the action system ! Tell me what you think about it in the comments :)</p>
+
+    <h2>Update the munition label</h2>
+    Finally, we want to update the munition label on our page. To do so, add these two functions in your Ship :
+<pre><code class="js">
+// Send the event ammo updated
+Ship.prototype.sendEvent = function() {
+    var e = new Event('ammoUpdated');
+    window.dispatchEvent(e);
+};
+
+// Create the event hook
+Ship.prototype._initLabelUpdate = function() {
+    // Update the html part
+    var updateAmmoLabel = function() {
+        document.getElementById("ammoLabel").innerHTML = "AMMO : "+ship.ammo;
+    };
+
+    BABYLON.Tools.RegisterTopRootEvents([{
+        name:"ammoUpdated",
+        handler : updateAmmoLabel
+    }]);
+};
+</code></pre>
+    <p>You just have to call the function <code>_initLabelUpdate</code> in your ship constructor.</p>
+
+    <h2>The fog</h2>
+    <blockquote class="twitter-tweet" data-conversation="none" lang="fr"><p><a href="https://twitter.com/Temechon">@Temechon</a> Just a bit of fog could be huge :)</p>
+        &mdash; David Catuhe (@deltakosh) <a href="https://twitter.com/deltakosh/statuses/491636564691140609">22 Juillet 2014</a></blockquote>
+    <script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script>
+    <p>
+        The last thing to do : add some fog :) (Thanks Deltakosh) I did it by adding only 2 lines in my function <code>initScene</code> :
+
+        <pre><code class="js">
+scene.fogMode = BABYLON.Scene.FOGMODE_EXP2;
+scene.fogDensity = 0.01;
+        </code></pre>
+
+    The first line is to enable the fog in my scene by giving him a fogMode, the second is the fog density.
+    </p>
+
+    <h2>What's next ?</h2>
+    <p>You just finished your second game prototype with Babylon.js using the actions system. Congrats :)
+        <span class="purple">Click on the image below to get the final code source</span> if you want to take a look at it. I updated/add several things in it, but feel free to
+        modify it as you wish.<br/>
+    <div class="centerImg" style="padding:0">
+        <a href="zip/plane.zip">
+            <img class="shadow" src="../../images/games.png" style="width:150px"/>
+        </a>
+    </div>
+    </p>
+    <hr/>
+
+    <p>
+        If you have any questions about it, feel free to email me at <span class="purple">temechon <code>[at]</code> pixelcodr <code>[dot]</code> com</span>, or leave a comment below,
+        I'll answer quickly. <br/>You can also <a href="http://eepurl.com/ZlBTX">subscribe to the newsletter</a> and you will receive an email when a new tutorial is out. No spam, and unsubscribe whenever you want.
+        <br/><br/>
+        Cheers !
+    </p>
+</div>

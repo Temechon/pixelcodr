@@ -3,7 +3,7 @@
   .project {
     display :flex;
     align-items:center;
-    font-family: "Open Sans", sans-serif;
+    font-family: $font-text;
     border-bottom: 1px solid $text-color-activate;
     padding: 40px 0 40px 0;
 

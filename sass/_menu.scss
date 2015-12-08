@@ -18,7 +18,7 @@
         font-size : 2em;
         text-align: center;
         text-transform: uppercase;
-        font-family: 'Montserrat', sans-serif;
+        font-family: $font-title;
         letter-spacing: 3px;
       }
 
@@ -30,7 +30,7 @@
           $space : 30px;
           margin-left:30px;
           padding: $space 0 0 $space;
-          font-family: 'Montserrat', sans-serif;
+          font-family: $font-title;
           font-size: 1em;
           i {
             padding-right: 10px;

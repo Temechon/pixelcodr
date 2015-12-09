@@ -1,0 +1,21 @@
+doctype html
+html(lang="en")
+    include ../../include/header.jade
+    link(rel='stylesheet', href='https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.0.0/styles/zenburn.min.css')
+    script(src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.0.0/highlight.min.js")
+    script.
+        hljs.initHighlightingOnLoad();
+
+    body
+
+        .wrapper
+            //Menu
+            include ../../include/menu.jade 
+
+            // Content
+            .right-space
+                .content
+                    h1 Oimo - How to use a new Physics plugin
+
+                    include ../../../content/tutos/oimo.html
+

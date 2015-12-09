@@ -3,8 +3,8 @@
     <h2>Plane - How to use Actions and ActionManager </h2>
 
     <div style="text-align:center; padding-top:40px; padding-bottom: 40px">
-        <img src="../../images/logos/babylonjs.png" style="max-height:75px;" />
-        <img src="../../images/logos/html5.png" style="max-height:75px;" /><br/>
+        <img src="/img/logos/babylonjs.png" style="max-height:75px;" />
+        <img src="/img/logos/html5.png" style="max-height:75px;" /><br/>
     </div>
     <p>
 
@@ -38,8 +38,6 @@
             <li>If the ship collides with one building, the game is over</li>
             <li>The player can click on one building to destroy it, but it consumes one bullet</li>
         </ul>
-    If you want, you can download my <a href="../start_babylon/start_project.zip">Babylon starting project</a>, or start from
-    scratch, but I will only describe the javascript part here. <br/>
 
     Ready ? Let's start :)
     </p>
@@ -482,11 +480,8 @@ Ship.prototype._initLabelUpdate = function() {
     <p>You just have to call the function <code>_initLabelUpdate</code> in your ship constructor.</p>
 
     <h2>The fog</h2>
-    <blockquote class="twitter-tweet" data-conversation="none" lang="fr"><p><a href="https://twitter.com/Temechon">@Temechon</a> Just a bit of fog could be huge :)</p>
-        &mdash; David Catuhe (@deltakosh) <a href="https://twitter.com/deltakosh/statuses/491636564691140609">22 Juillet 2014</a></blockquote>
-    <script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script>
-    <p>
-        The last thing to do : add some fog :) (Thanks Deltakosh) I did it by adding only 2 lines in my function <code>initScene</code> :
+
+        The last thing to do : add some fog :) I did it by adding only 2 lines in my function <code>initScene</code> :
 
         <pre><code class="js">
 scene.fogMode = BABYLON.Scene.FOGMODE_EXP2;
@@ -502,7 +497,7 @@ scene.fogDensity = 0.01;
         modify it as you wish.<br/>
     <div class="centerImg" style="padding:0">
         <a href="zip/plane.zip">
-            <img class="shadow" src="../../images/games.png" style="width:150px"/>
+            <img class="shadow" src="/img/games.png" style="width:150px"/>
         </a>
     </div>
     </p>

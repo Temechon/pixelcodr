@@ -1,0 +1,185 @@
+<div class="tutorial">
+<h2>Working with physics</h2>
+
+<div style="text-align:center; padding-top:40px; padding-bottom: 40px">
+    <img src="/img/logos/babylonjs.png" style="max-height:75px;" />
+</div>
+<p>
+
+</p>
+
+<h2>Objective</h2>
+
+    <p>
+        This tutorial will explain how to manipulate a mesh with the default physics plugin in Babylonjs : Oimo.js.<br/>
+        We will not see the global structure of a game, as it has already been detailed in a previous tutorial. Thus, I strongly recomend to
+        look at the source code of the prototype while reading this article.<br/>
+        We will talk about:
+        <ul>
+        <li>Oimo js</li>
+        <li>Linear and angular velocity</li>
+        <li>Friction and restitution</li>
+        </ul>
+        As usual, if you have any questions, my Twitter is at the bottom of the page. Let's start !
+    </p>
+<div class=" centerImg centerImgBig">
+    <a href="../../tutos/physics/game/index.html">
+        <img src="../../tutos/physics/img/final.png" />
+    </a>
+</div>
+
+    <h2>The scene creation</h2>
+
+    <p>
+        The scene is created in the method <code>GameState._initScene</code>. The only interesting point is the ground creation:
+    </p>
+<pre><code class="js">
+var ground = BABYLON.Mesh.CreateGround("ground", 500, 500, 1, scene);
+ground.setPhysicsState(BABYLON.PhysicsEngine.BoxImpostor, {mass:0, restitution:0.5, friction:0.1});
+
+</code></pre>
+
+    <p>
+        You can see a physics state has been assigned to the ground, with 2 parameters:
+        <ul>
+            <li>BABYLON.PhysicsEngine.BoxImpostor</li>
+            <li>{mass:0, restitution:0.5, friction:0.1}</li>
+        </ul>
+        The first parameter is the kind of impostor you will use for the ground, and the second one represents the impostor parameters.
+    </p>
+
+    <h2>Impostors ?</h2>
+    <p>
+        An impostor is a simple shape used to approximate heavy physics calculations, used primarly for perfomances reasons.
+        All collisions detections will then be performed on the impostor, and not on the original mesh. Awesome, right ? <br/>
+        However, it won't be possible to have pixel perfect collisions.
+    </p>
+
+    <p>
+        Each impostor is set a physics material, with 3 attributes :
+        <uL>
+            <li>A mass</li>
+            <li>A friction coefficient</li>
+            <li>A restitution coefficient</li>
+        </uL>
+        <b>The mass</b> is self-explanatory: it's the object mass. If set to 0, the object won't be affected by the world gravity, and thus won't move at all.
+The default value is 0.<br/>
+        <b>The friction coefficient</b> represents the resistance when two objects are sliding against each other. 0 means no friction, and 1 means a lot of friction.
+The default value is 0.2.<br/>
+        <b>The restitution coefficient</b> represents the bouncyness of the material. It's a value between 0 and 1, with 0 no boucyness at all.
+The default value is 0.2.<br/><br/>
+        Be careful ! If you use a value to 0 for friction and restitution, Oimo will set you the default value instead. You will have to use very small values, like 0.0001 for example.
+    </p>
+    <p>
+        In Oimo, there are only 3 kind of impostors:
+        <ul>
+            <li>BoxImpostor</li>
+            <li>PlaneImpostor</li>
+            <li>SphereImpostor</li>
+        </ul>
+    </p>
+
+    <h2>The player</h2>
+
+    <p>
+        The player will be represented by a box that can be moved on the ground with the ZQSD/WASD keys.<br/>
+        Each key press will generate an impulsion to move the box.
+    </p>
+<pre><code class="js">
+this.box = BABYLON.Mesh.CreateBox("player", 5, this.scene);
+this.box.position.y = 2;
+this.body = this.box.setPhysicsState(BABYLON.PhysicsEngine.BoxImpostor, {mass:1, friction:0.001, restitution:1.5});
+</code></pre>
+
+    <p>
+        The player box has no friction, and a big restitution factor. You can see I store the return of <code>setPhysicsState</code> in a variable.
+        This variable is an instance of a OIMO.Body, and contains a link to a OIMO.RigidBody.This will be useful to update the body linear velocity and angular velocity.
+    </p>
+
+<pre><code class="js">
+handleKeyDown : function(keycode) {
+    switch (keycode) {
+    case Player.DIRECTIONS.ZQSD.TOP :
+    case Player.DIRECTIONS.QWSD.TOP :
+        this._chooseDirection(0, 1);
+        break;
+    case Player.DIRECTIONS.ZQSD.BOT :
+    case Player.DIRECTIONS.QWSD.BOT :
+        this._chooseDirection(1, 1);
+        break;
+    case Player.DIRECTIONS.ZQSD.LEFT:
+    case Player.DIRECTIONS.QWSD.LEFT :
+        this._chooseDirection(2, 1);
+        break;
+    case Player.DIRECTIONS.ZQSD.RIGHT:
+    case Player.DIRECTIONS.QWSD.RIGHT :
+        this._chooseDirection(3, 1);
+        break;
+    }
+}
+
+</code></pre>
+<p>
+    With the method <code>handleKeyDown</code>, a boolean is set to true if a key is pressed, and set to false is the key is released.<br/>
+    The method <code>move</code> will then use these values to move the box, by applying impulsions with a given force.
+</p>
+<pre><code class="js">
+move : function() {
+    var s = 5;
+
+    if (this.mvtDirection[0] != 0) {
+        this.box.applyImpulse(new BABYLON.Vector3(0,0,s), this.box.position);
+    }
+    if (this.mvtDirection[1] != 0) {
+        this.box.applyImpulse(new BABYLON.Vector3(0,0,-s), this.box.position);
+    }
+    if (this.mvtDirection[2] != 0) {
+        this.box.applyImpulse(new BABYLON.Vector3(-s,0,0), this.box.position);
+    }
+    if (this.mvtDirection[3] != 0) {
+        this.box.applyImpulse(new BABYLON.Vector3(s,0,0), this.box.position);
+    }
+    this.body.body.linearVelocity.scaleEqual(0.92);
+    this.body.body.angularVelocity.scaleEqual(0);
+}
+</code></pre>
+
+    <p>
+        You can see the method <code>box.applyImpulse</code> is used each time we want the box to move. This method takes 2 parameters:
+        the force to be applied, and the contact point.<br/>
+        But the last two lines are interesting:
+    </p>
+<pre><code class="js">
+this.body.body.linearVelocity.scaleEqual(0.92);
+this.body.body.angularVelocity.scaleEqual(0);
+
+</code></pre>
+<p>
+    <code>linearVelocity</code> is an attribute of the OIMO.RigidBody class from OIMO.
+    This vector represents the current speed of the box, and is an instance of
+    the class <code>OIMO.Vec3</code>. This class has one method called <code>scaledEqual</code>, that multiply each coordinate of
+    the vector with the given scalar.<br/>
+    Here, we don't want the player to rotate, so we set the angular velocity to 0. <br/>
+    The linear velocity is then scaled by 0.92, to create a smooth movement of the player on the ground. Try different values for this, and see what happens :)
+</p>
+<h2>Conclusion</h2>
+<p>
+    And you're done with a working prototype! Now, if you add a weapon that shoots bullets, a gamepad handler, several player on the same ground, you will have
+    a nice game. Maybe the next big game of 2015 ! (If so, just mention my name in the credits, and I will love you forever;) )
+    <br/><a href="../../tutos/physics/game/index.html">Click here to run the physics demo</a>,
+    or <span class="purple">click on the image below to get the final code source</span> if you want to take a look at it.<br/>
+<div class="centerImg" style="padding:0">
+    <a href="../../tutos/physics/zip/physics.zip">
+        <img class="shadow" src="/img/games.png" style="width:150px"/>
+    </a>
+</div>
+</p>
+<hr/>
+
+<p>
+    If you have any questions about it, feel free to email me at <span class="purple">temechon <code>[at]</code> pixelcodr <code>[dot]</code> com</span>, or leave a comment below,
+    I'll answer quickly. <br/>You can also <a href="http://eepurl.com/ZlBTX">subscribe to the newsletter</a> and you will receive an email when a new tutorial is out. No spam, and unsubscribe whenever you want.
+    <br/><br/>
+    Cheers !
+</p>
+</div>

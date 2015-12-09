@@ -1,0 +1,358 @@
+<div class="tutorial">
+    <h2>Tree Generator - How to use VertexData object</h2>
+
+    <div style="text-align:center; padding-top:40px; padding-bottom: 40px">
+        <img src="/img/logos/babylonjs.png" style="max-height:75px;" />
+        <img src="/img/logos/html5.png" style="max-height:75px;" /><br/>
+    </div>
+    <p>
+
+    </p>
+    <p>
+        To understand this tutorial, you should have some experience with Babylon.js or completed my
+        <a href="../toad_attack/toad_attack.html">first tutorial</a>.
+    </p>
+
+    <h2>Objective</h2>
+    <p>
+        In this new Babylon.js tutorial, we will learn how to retrieve and manipulate vertices of an object, to finally update their values in order to create a new geometry.<br/>
+        I will use the wonderful library <a href="http://llllll.li/randomColor/">randomColor</a> made
+        by <a href="https://twitter.com/davidmerfieId">David Merfield</a> to generate a random color for my trees.<br/>
+        In this page, I will assume you know how to use basic components of Babylon.js (but if you completed my two first tutorials,
+        you will be fine) :)<br/>
+
+        Let's start !
+    </p>
+
+    <h2>What you will create</h2>
+
+    <p>You will create a very simple polygonal tree generator. Each tree will be randomly generated from a same template (a simple sphere).<br/>
+    Click on the image below or <a href="game/index.html">here to run the tree generator.</a>
+    </p>
+    <div class=" centerImg centerImgBig">
+        <a href="game/index.html"><img src="img/final.png" /></a>
+    </div>
+
+
+    <h2>The environment</h2>
+
+    For this demo, the environment is composed of a skydome (see <a href="../oimo/oimo.html">tutorial Oimo</a>), an exponential fog and a simple ground.
+    The ground is a plane with a simple color. The specular color is set to black (no specular) to give it a mat aspect:
+    <pre><code class="js">
+// Fog
+scene.fogMode = BABYLON.Scene.FOGMODE_EXP2;
+scene.fogDensity = 0.003;
+scene.fogColor = new BABYLON.Color3(0.8,0.83,0.8);
+
+// Ground
+var ground = BABYLON.Mesh.CreateGround("ground", 1000, 1000, 1, scene);
+ground.material = new BABYLON.StandardMaterial("ground", scene);
+ground.material.diffuseColor = BABYLON.Color3.FromInts(193, 181, 151);
+ground.material.specularColor = BABYLON.Color3.Black();
+    </code></pre>
+
+    All of our trees are projecting shadows, but we will see this point after the tree generation.
+
+    <h2>Generate a polygonal tree</h2>
+
+    A polygonal tree is composed of two things:
+    <ul>
+        <li>a foliage</li>
+        <li>a trunk</li>
+    </ul>
+    The trunk will be a simple cylinder with a small number of sides. The key point of our tree will be the foliage.<br/>
+    We will create the foliage like this :
+    <ul>
+        <li>Create a sphere with a small number of segment</li>
+        <li>Retrieve the position of each vertex of the sphere</li>
+        <li>For each vertex of the sphere, move its position with a random vector</li>
+        <li>Generate the new normals of the sphere</li>
+        <li>Update the sphere mesh with the new vertices positions and normals</li>
+    </ul>
+    But first, a little bit of theory.
+
+
+    <h2>A little bit of theory</h2>
+    The basic object used in a 3D polygon is a vertex: a point in a 3D space. Two vertices connected creates an edge, and three vertices connected creates a triangle.<br/>
+    Therefore, a 3D polygon is a set a vertices connected to each others to create triangles.<br/>
+    Each vertex has 3 kind of information:
+    <ul>
+        <li>A position - The vertex position in a 3D space.</li>
+        <li>A texture coordinate (called UV coordinate) - Answers to the question "Which part of the texture should be applied on this vertex ?"</li>
+        <li>A normal vector - A directional vector, used to determine the vertex orientation toward a light source</li>
+    </ul>
+
+    Each face of a polygon has its own vertices. A cube for example will have a total of 24 vertices (6 faces, each faces has 4 vertices), because each vertex will have
+    its normal for the corresponding face.
+
+    <div class="centerImg">
+        <img src="img/cubevertices.jpg" />
+    </div>
+
+    In Babylon.js, a mesh geometry is internally represented by (at least) four lists:
+    <ul>
+        <li>A list of vertices positions</li>
+        <li>A list of vertices normals</li>
+        <li>A list of vertices UV coordinates</li>
+        <li>A list of indices</li>
+    </ul>
+    The list of indices is here to create triangles: each set of 3 indices represents a triangle.<br/>
+
+    So, if we want to update the position of a vertices in a mesh, we should update all vertices at the same position, in order to keep a
+    coherent geometry. Moreover,
+    if we want our object to react correctly to a light source, the normal list should also be updated.
+
+    <p>
+        In order to increase the polygonal aspect of a tree, we will convert the mesh to a flat shaded mesh.
+        <div class="centerImg">
+            <img src="img/flatshading.png" />
+        </div>
+        The flat shading is a fast lightning technique, coloring all vertices of a face with the same color, giving it the polygonal aspect we are looking for.
+    </p>
+
+    <h2>The Tree Generator</h2>
+
+    The Tree Generator is a class whose only purpose will be to generate a number of trees, each
+    one at a random position.<br/>
+    The parameters of the generation are given in the constructor, and will later be updated by dat.gui.
+
+    <pre><code class="js">
+TreeGenerator = function(scene, sd) {
+    this.scene = scene;
+    // The shadow generator, to add each created tree in the render list
+    this.sd = sd;
+    // The number of trees to generate
+    this.treeNumber = 50;
+    // The list containing all trees
+    this._trees = [];
+
+    // The size (min/max) of the foliage
+    this.minSizeBranch = 15;
+    this.maxSizeBranch = 20;
+    // The size (min/max) of the trunk
+    this.minSizeTrunk = 10;
+    this.maxSizeTrunk = 15;
+    // The radius (min/max) of the trunk
+    this.minRadius = 1;
+    this.maxRadius = 5;
+};
+    </code></pre>
+    The generate method will have the folowing behaviour:
+    <ul>
+        <li>Remove all trees</li>
+        <li>Generate random parameters for the tree</li>
+        <li>Create a new tree</li>
+        <li>Update its position to a random location</li>
+    </ul>
+    Here is the corresponding code:
+
+<pre><code class="js">
+// Clean
+this._trees.forEach(function(t) {
+    t.dispose();
+});
+this._trees = [];
+
+// For all trees to create
+for (var i = 0; i&lt;this.treeNumber; i++) {
+    // Random parameters
+    size = randomNumber(this.minSizeBranch,this.maxSizeBranch);
+    sizeTrunk = randomNumber(this.minSizeTrunk,this.maxSizeTrunk);
+    radius = randomNumber(this.minRadius,this.maxRadius);
+    x = randomNumber(-300, 300);
+    z = randomNumber(-300, 300);
+
+    // Tree creation !
+    var tree = new Tree(size, sizeTrunk, radius, this.scene, this.sd);
+    tree.position.x = x;
+    tree.position.z = z;
+    this._trees.push(tree);
+}
+</code></pre>
+
+    <h2>The Tree class</h2>
+
+    In a new js file, we will create a class called <code>Tree</code> extending the Mesh class of Babylon (<a href="../plane/plane.html">see tutorial #2</a>).
+    A Tree will have 3 parameters : the size of the foliage, the height and the radius of the trunk.
+    <pre><code class="js">
+Tree = function(sizeBranch, sizeTrunk, radius, scene) {
+    // Call the super class BABYLON.Mesh
+    BABYLON.Mesh.call(this, "tree", scene);
+    // ...
+};
+
+// Our object is a BABYLON.Mesh
+Tree.prototype = Object.create(BABYLON.Mesh.prototype);
+// And its constructor is the Tree function described above.
+Tree.prototype.constructor = Tree;
+    </code></pre>
+
+    In the constructor, the trunk is created (a simple cylinder), and the color of the foliage (and of the trunk) is randomly generated.
+    <pre><code class="js">
+// The color of the foliage
+var branchColor = randomColor({hue: 'green', luminosity: 'darl', format: 'rgbArray'});
+this.material = new BABYLON.StandardMaterial("mat", scene);
+this.material.diffuseColor = BABYLON.Color3.FromInts(branchColor[0],branchColor[1],branchColor[2]);
+this.material.specularColor = BABYLON.Color3.Black();
+
+// The trunk creation
+var trunk = BABYLON.Mesh.CreateCylinder("trunk", sizeTrunk, radius-2<1?1:radius-2, radius, 7, 2, scene );
+trunk.parent = this;
+// Trunk position relative to its parent (the foliage)
+trunk.position.y = (-sizeBranch/2+2)-sizeTrunk/2;
+
+// The trunk color
+var trunkColor = randomColor({hue: 'orange',luminosity: 'dark', format: 'rgbArray'});
+trunk.material = new BABYLON.StandardMaterial("trunk", scene);
+trunk.material.diffuseColor = BABYLON.Color3.FromInts(trunkColor[0],trunkColor[1],trunkColor[2]);
+trunk.material.specularColor = BABYLON.Color3.Black();
+// The trunk is converted in a flat shaded mesh !
+trunk.convertToFlatShadedMesh();
+
+this.trunk = trunk;
+// Position of the foliage
+this.position.y = sizeTrunk+sizeBranch/2-2;
+    </code></pre>
+
+    With this code, we can see the following display :
+    <div class="centerImgBig centerImg">
+        <img src="img/tree0.jpg"/>
+    </div>
+
+    Not very exciting, isn't it ? :)
+
+    <h2>The foliage creation</h2>
+
+    The magic happens in the Tree class. In a method called <code>_init</code>, we will create a simple sphere shape
+    with a small number of segments (I used 2 for my demo, but you can try to experiment with other values.)<br/>
+    The class <code>VertexData</code> will create a VertexData object, containing these members: positions, normals, uv, indices... Does
+    it say anything to you ?<br/>
+    You are right, a VertexData is the main component of a mesh geometry!
+
+   <pre><code class="js">
+// Sphere shape creation
+var vertexData = BABYLON.VertexData.CreateSphere(2,sizeBranch);
+// Apply the shape to our tree
+vertexData.applyToMesh(this, false);
+    </code></pre>
+    After this, our foliage is sphere-shaped, and we can retrieve its position, normals, ... You can also do all this process
+    before applying the shape to the mesh of course.<br/>
+    To access the mesh vertices data, you can use these methods:
+    <ul>
+        <li>getVerticeData(<i>kind</i>)</li>
+        <li>getIndices()</li>
+    </ul>
+    The parameter <i>kind</i> is used to specify the kind of data you want : position, normals, ...
+    For this demo, only one kind is used :
+    <ul>
+        <li>VertexBuffer.PositionKind</li>
+    </ul>
+    The thing is here to move all vertices at the same position with a small random value.
+<pre><code class="js">
+var positions = this.getVerticesData(BABYLON.VertexBuffer.PositionKind);
+var numberOfPoints = positions.length/3;
+
+// Build a map containing all vertices at the same position
+var map = [];
+for (var i=0; i&lt;numberOfPoints; i++) {
+    var p = new v3(positions[i*3], positions[i*3+1], positions[i*3+2]);
+
+    var found = false;
+    for (var index=0; index&lt;map.length&amp;&amp;!found; index++) {
+        var array = map[index];
+        var p0 = array[0];
+        if (p0.equals (p) || (p0.subtract(p)).lengthSquared() < 0.01){
+            array.push(i*3);
+            found = true;
+        }
+    }
+    if (!found) {
+        var array = [];
+        array.push(p, i*3);
+        map.push(array);
+    }
+}
+
+var that = this;
+// For each vertex at a given position, move it with a random value
+map.forEach(function(array) {
+    var index, min = -sizeBranch/10, max = sizeBranch/10;
+    var rx = randomNumber(min,max);
+    var ry = randomNumber(min,max);
+    var rz = randomNumber(min,max);
+
+    for (index = 1; index&lt;array.length; index++) {
+        var i = array[index];
+        positions[i] += rx;
+        positions[i+1] += ry;
+        positions[i+2] += rz;
+    }
+});
+</code></pre>
+    The last step is to convert our foliage into a flat shaded mesh, like this:
+
+   <pre><code class="js">
+this.convertToFlatShadedMesh();
+   </code></pre>
+
+    Here is the result with several segment number :
+    <div class="centerImg centerImgBig">
+        <img src="img/tree_segments.png" />
+    </div>
+
+    <h2>"The brightest flame casts the darkest shadow."</h2>
+
+    Now, we want to generate a shadow on the ground for each tree. In babylon v1.13, only directional lights can cast shadows.
+    So let's create a directional light with a given position far away of the ground:
+
+    <pre><code class="js">
+var d1 = new BABYLON.DirectionalLight("dir", new BABYLON.Vector3(1, -1, -2), scene);
+d1.position = new BABYLON.Vector3(-300,300,600);
+    </code></pre>
+    With these parameters, the shadow will be casted along the X-axis and the Z-axis.
+
+    You can easily create shadows with a <code>ShadowGenerator</code>. This object will create a shadow map, that you can use to specify
+    which object is casting a shadow. The ShadowGenerator takes a size (the size of the shadow map, should be a power of two) and a directional light to be created.
+
+    <pre><code class="js">
+var shadowGenerator = new BABYLON.ShadowGenerator(2048, d1);
+    </code></pre>
+
+    The ground must be configured to receive shadows:
+    <pre><code class="js">
+ground.receiveShadows = true;
+    </code></pre>
+
+    Finally, in the Tree constructor, add each mesh (the foliage and the trunk) in the shadow map render list, like this:
+    <pre><code class="js">
+shadowGenerator.getShadowMap().renderList.push(this);
+shadowGenerator.getShadowMap().renderList.push(this.trunk);
+    </code></pre>
+
+    And that's it ! You have shadows, and your tree generator is now finished!<br/>
+
+    As you can see, it can be easy to manipulate mesh vertices directly, and can be useful for procedural generation.
+    Go ahead and play with it :)
+
+    <div class="centerImgBig centerImg">
+        <img src="img/final2.jpg" />
+    </div>
+
+    <h2>What's next ?</h2>
+    <p>
+        <a href="game/index.html">Click here to run the final demo</a>, or <span class="purple">click on the image below to get the final code source</span> if you want to take a look at it.<br/>
+    <div class="centerImg" style="padding:0">
+        <a href="zip/trees.zip">
+            <img class="shadow" src="/img/games.png" style="width:150px"/>
+        </a>
+    </div>
+    </p>
+    <hr/>
+
+    <p>
+        If you have any questions about it, feel free to email me at <span class="purple">temechon <code>[at]</code> pixelcodr <code>[dot]</code> com</span>, or leave a comment below,
+        I'll answer quickly. <br/>You can also <a href="http://eepurl.com/ZlBTX">subscribe to the newsletter</a> and you will receive an email when a new tutorial is out. No spam, and unsubscribe whenever you want.
+        <br/><br/>
+        Cheers !
+    </p>
+</div>

@@ -1,0 +1,528 @@
+<!DOCTYPE html><html lang="en"><head><title></title><link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css"><link rel="stylesheet" href="//cdn.jsdelivr.net/flexboxgrid/6.3.0/flexboxgrid.min.css" type="text/css"><link href="https://fonts.googleapis.com/css?family=Oswald" rel="stylesheet" type="text/css"><link href="https://fonts.googleapis.com/css?family=Montserrat" rel="stylesheet" type="text/css"><link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400" rel="stylesheet" type="text/css"><link rel="stylesheet" href="/css/main.css"></head><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.0.0/styles/zenburn.min.css"><script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.0.0/highlight.min.js"></script><script>hljs.initHighlightingOnLoad();
+</script><body><div class="wrapper"><!--Menu--><div class="menu"><div class="menu-content"><div class="name">Julian</div><div class="name">"Temechon"</div><div class="items"><div class="item"><a href="/projects.html"><i class="fa fa-gamepad"></i>Projects</a></div><div class="item"><a href="/tutorials.html"><i class="fa fa-graduation-cap"></i>Babylon.js tutorials</a></div><div class="item"><a href="https://github.com/Temechon" target="_new"><i class="fa fa-github"></i>Github</a></div><div class="item"><a href="/aboutme.html"><i class="fa fa-user"></i>About me</a></div><div class="item"><a href="http://learningbabylonjs.com/" target="_new"><i class="fa fa-rocket"></i>Learning Babylon.js</a></div></div></div></div><!-- Content--><div class="right-space"><div class="content"><h1>Shooter ! - A FPS prototype</h1><div class="tutorial">
+<h2>Shooter ! - A FPS prototype</h2>
+
+<div style="text-align:center; padding-top:40px; padding-bottom: 40px">
+    <img src="/img/logos/babylonjs.png" style="max-height:75px;" />
+</div>
+<p>
+
+</p>
+
+<h2>Objective</h2>
+
+    <p>
+        This tutorial will explain how to create a FPS game with Babylon.js. Here are several things (amongst others) we will talk about :
+        <ul>
+        <li>Asset loader</li>
+        <li>Camera viewport</li>
+        <li>Camera layer masks</li>
+        <li>Pointer lock API</li>
+        </ul>
+        Don't be afraid by all this, I will try to be as clearer as possible. And if you have any questions, my Twitter is at the bottom of the page ;)
+    </p>
+
+    <h2>What you will create</h2>
+
+<p>A fully working FPS ! With a gun and a gunsight, a camera you can move with ZQSD (or WASD), some targets and a minimap.<br/>
+    You can click on the image below or <a href="game/index.html">here to try it.</a>
+</p>
+<div class=" centerImg centerImgBig">
+    <a href="game/index.html">
+        <img src="img/final.jpg" />
+    </a>
+</div>
+
+    <h2>The <del>class</del> diagram</h2>
+        Our game will have several javascript classes, as described in the little diagram below :
+    <p>
+    <div class="centerImg">
+        <a href="game/index.html">
+            <img src="img/diagramme.jpg" />
+        </a>
+    </div>
+
+    <ul>
+        <li>The class Game will be the main class, and will be in charge of loading
+            all models, creating the environment, the player and the arena.</li>
+        <li>The class Player will represent the player: the camera, and all users actions (click and
+            movement.</li>
+        <li>
+            The class Weapon will represent our weapon.</li>
+        <li> The class Arena will be the physical environment: the ground and the world our player will
+        live in.</li>
+        <li>The class Target will be anything that can be shot :)</li>
+    </ul>
+    </p>
+
+    <h2>The starting file</h2>
+    <p>
+        I updated my starting project to make it more... classy. You can download it by clicking <a href="../start_babylon/start_project.zip">here.</a>
+        I use the last version of babylon (1.14), and several actions are already done in the Game class.
+    </p>
+
+    <h2>The assets loader</h2>
+    <p>
+        The version 1.14 of Babylon has been shipped with a new cool feature: the <a href="http://www.babylonjs.com/scenes/assets/index.html">Assets Manager</a>.
+        Its behaviour is well explained in the <a href="https://github.com/BabylonJS/Babylon.js/wiki/Using-AssetsManager">Babylon wiki</a>.<br/>
+        This feature can be used to load a complete scene, but we will use it to preload all of our 3D models, and store it in memory (like
+        I explain it in my <a href="../preloader/preloader.html">last tutorial</a>).<br/>
+        Here is the code:
+    </p>
+
+<pre><code class="js">
+this.loader =  new BABYLON.AssetsManager(this.scene);
+
+// An array containing the loaded assets
+this.assets = {};
+
+var _this = this;
+var meshTask = this.loader.addMeshTask("gun", "", "./assets/", "gun.babylon");
+meshTask.onSuccess = function(task) {
+    _this._initMesh(task);
+};
+</code></pre>
+
+    <p>
+        The loader object is first created. Then, all tasks are added to the loader (I only have one 3D model to load).
+        The 'onSuccess' function precised in my loading task will add the loaded mesh in my array 'assets', like it is described below.
+    </p>
+
+<pre><code class="js">
+/**
+* Initialize a mesh once it has been loaded. Store it in the asset array and set it not visible.
+* @param task
+* @private
+*/
+_initMesh : function(task) {
+    this.assets[task.name] = task.loadedMeshes;
+    for (var i=0; i&lt;task.loadedMeshes.length; i++ ){
+        var mesh = task.loadedMeshes[i];
+        mesh.isVisible = false;
+    }
+}
+</code></pre>
+
+    <p>
+        Finally, a 'onFinish' function is added to the loader. This function will create the player object, the arena, and create the
+        render loop.<br/>
+        Don't forget to start the loader with the 'load' method :)
+    </p>
+
+<pre><code class="js">
+this.loader.onFinish = function (tasks) {
+
+    // Player and arena creation when the loading is finished
+    var player = new Player(_this);
+    var arena = new Arena(_this);
+
+    engine.runRenderLoop(function () {
+        _this.scene.render();
+    });
+};
+
+this.loader.load();
+</code></pre>
+
+    <h2>The Player</h2>
+
+    <p>
+        In a classic FPS game, the player is only represented by a camera that can be moved with ZQSD(WASD) keys, and rotated with the mouse.
+        Luckily, we have the exact same object in Babylon: a FreeCamera ! This camera needs to be tweaked a little bit, but nothing complicated.<br/>
+        All the code below is in the class constructor:
+    </p>
+
+<pre><code class="js">
+// The player eyes height
+this.height = 2;
+// The player speed
+this.speed = 1;
+// The player inertia
+this.inertia = 0.9;
+// The mouse sensibility (lower is most sensible)
+this.angularSensibility = 1000;
+// The player camera
+this.camera = this._initCamera();
+    ...
+/**
+* Init the player camera
+* @returns {BABYLON.FreeCamera}
+* @private
+*/
+_initCamera : function() {
+    var cam = new BABYLON.FreeCamera("camera", this.spawnPoint, this.scene);
+    cam.attachControl(this.scene.getEngine().getRenderingCanvas());
+    cam.ellipsoid = new BABYLON.Vector3(2, this.height, 2);
+    // Activate collisions
+    cam.checkCollisions = true;
+    // Activate gravity !
+    cam.applyGravity = true;
+
+    // Remap keys to move with ZQSD
+    cam.keysUp = [90]; // Z
+    cam.keysDown = [83]; // S
+    cam.keysLeft = [81]; // Q
+    cam.keysRight = [68]; // D
+    cam.speed = this.speed;
+    cam.inertia = this.inertia;
+    cam.angularSensibility = this.angularSensibility;
+    return cam;
+}
+</code></pre>
+
+    <p>
+        If you run your game now, your player will fall... You need to create a ground the camera can move on... But we will
+        create it later in the Arena class. Now, we need two things: a gunsight, and make the camera rotate without the user to click on the canvas.
+    </p>
+
+    <h2>The gunsight</h2>
+
+    <p>
+        The gunsight is only an image in the center of the screen. No javascript here :)
+    </p>
+<pre><code class="css">
+&lt;img id="gunsight" src="assets/viseur.png" /&gt;
+
+#gunsight {
+    position:absolute;
+    top:50%;
+    left:50%;
+    margin-top:-37px;
+    margin-left:-37px;
+}
+</code></pre>
+
+    <h2>The Pointer Lock API</h2>
+
+    <p>
+        In order to take control of the user mouse and remove his cursor, we must use the Pointer Lock API. This API provides some useful
+        methods to lock the mouse, as described in the <a href="https://developer.mozilla.org/en-US/docs/Web/API/Pointer_Lock_API">
+        offical documentation</a>: <i>locks the target of mouse events to a single element,
+        eliminates limits on how far mouse movement can go in a single direction, and removes the cursor from view.</i>
+        Exactly what we want to do !
+        <br/>
+        Be aware the 'locked' state can be removed by pressing the Escape key, and we want to handle that too.
+    </p>
+    <p>
+        The only thing to pay attention to is that the user must activate himself the pointer lock. Our game cannot start with it.
+        Let's try it on a 'click' event.
+    </p>
+
+<pre><code class="js">
+_initPointerLock : function() {
+    var _this = this;
+    // Request pointer lock
+    var canvas = this.scene.getEngine().getRenderingCanvas();
+    // On click event, request pointer lock
+    canvas.addEventListener("click", function(evt) {
+        canvas.requestPointerLock = canvas.requestPointerLock || canvas.msRequestPointerLock || canvas.mozRequestPointerLock || canvas.webkitRequestPointerLock;
+        if (canvas.requestPointerLock) {
+            canvas.requestPointerLock();
+        }
+    }, false);
+
+    // Event listener when the pointerlock is updated (or removed by pressing ESC for example).
+    var pointerlockchange = function (event) {
+        _this.controlEnabled = (
+                           document.mozPointerLockElement === canvas
+                        || document.webkitPointerLockElement === canvas
+                        || document.msPointerLockElement === canvas
+                        || document.pointerLockElement === canvas);
+        // If the user is alreday locked
+        if (!_this.controlEnabled) {
+            _this.camera.detachControl(canvas);
+        } else {
+            _this.camera.attachControl(canvas);
+        }
+    };
+
+    // Attach events to the document
+    document.addEventListener("pointerlockchange", pointerlockchange, false);
+    document.addEventListener("mspointerlockchange", pointerlockchange, false);
+    document.addEventListener("mozpointerlockchange", pointerlockchange, false);
+    document.addEventListener("webkitpointerlockchange", pointerlockchange, false);
+}
+</code></pre>
+
+    <h2>Kill it with fire !!</h2>
+
+    <p>
+        Last thing for the player class : fire ! But first, we need to give him a weapon... Let's create it in the constructor.
+        Then, an action is added to a 'click' event on the game canvas to make it fire :)
+    </p>
+
+<pre><code class="js">
+// The player weapon
+this.weapon = new Weapon(game, this);
+
+// Event listener on click on the canvas
+canvas.addEventListener("click", function(evt) {
+var width = _this.scene.getEngine().getRenderWidth();
+var height = _this.scene.getEngine().getRenderHeight();
+
+if (_this.controlEnabled) {
+    var pickInfo = _this.scene.pick(width/2, height/2, null, false, _this.camera);
+    _this.weapon.fire(pickInfo);
+}
+}, false);
+</code></pre>
+
+    <p>
+        The function <i>scene.pick</i> is used to retrieved several information about where the player clicked:
+        the picked point and the picked mesh for example. Useful if we want to destroy only enemies target :)
+    </p>
+
+    <h2>The (mighty) weapon</h2>
+
+    <p>
+        Remember the 3D model loaded in our Game class (thank you Jb) ? We will use it now !
+        The following code is part of the Weapon constructor:
+    </p>
+
+<pre><code class="js">
+// The weapon mesh
+var wp = game.assets["gun"][0]; // The mesh at index 0 is the parent of the whole object
+wp.isVisible = true;
+wp.rotationQuaternion = null;
+wp.rotation.x = -Math.PI/2;
+wp.rotation.y = Math.PI;
+wp.parent = player.camera; // The weapon will move with the player camera
+wp.position = new BABYLON.Vector3(0.25,-0.4,1);
+this.mesh = wp;
+</code></pre>
+
+    <p>
+        The method <i>fire</i> is below. The Weapon object only checks if the targetet mesh is a target, and if so destroy it.
+        If it is not a target, an bullet impact is created (actually a small box).<br/>
+        Of course, we could have done a much more complicated code, with particles everywhere and so on.
+    </p>
+
+<pre><code class="js">
+/**
+* Fire the weapon if possible.
+* The mesh is animated and some particles are emitted.
+*/
+fire : function(pickInfo) {
+    if (this.canFire) {
+        if (pickInfo.hit && pickInfo.pickedMesh.name === "target") {
+            pickInfo.pickedMesh.explode();
+        } else {
+            var b = BABYLON.Mesh.CreateBox("box", 0.1, this.game.scene);
+            b.position = pickInfo.pickedPoint.clone();
+        }
+        this.animate();
+        this.canFire = false;
+    } else {
+        // Nothing to do : cannot fire
+    }
+}
+</code></pre>
+
+    <p>
+        Right now, our weapon can fire several times by seconds. Let's change that with a controlled fire rate.
+        Just add this in the Weapon controller:
+    </p>
+
+<pre><code class="js">
+var _this = this;
+this.game.scene.registerBeforeRender(function() {
+    if (!_this.canFire) {
+        _this._currentFireRate -= BABYLON.Tools.GetDeltaTime();
+        if (_this._currentFireRate <= 0) {
+            _this.canFire = true;
+            _this._currentFireRate = _this.fireRate;
+        }
+    }
+});
+</code></pre>
+
+    <p>
+        The function <i>registerBeforeRender</i> called on the game scene takes a callback function as a parameter.
+        It will be called before rendering the scene.<br/>
+        <i>BABYLON.Tools.GetDeltaTime()</i> is used to retrieved the time spent between two rendering.
+        With this, we have a perfect fire rate, completly independent of the number of frames per seconds.
+    </p>
+
+    <p>
+        I'm sure you noticed the 'animate' function in the 'fire' method. This function is used to create a small
+        weapon recoil, in order to add some dynamism to our game. Check it out:
+    </p>
+
+<pre><code class="js">
+/**
+* Animate the weapon
+*/
+animate : function() {
+    // The initial rotation is the initial mesh rotation
+    var start = this._initialRotation.clone();
+    var end = start.clone();
+    // The actual rotation of the mesh
+    end.x += Math.PI/10;
+
+    // Create the Animation object
+    var display = new BABYLON.Animation(
+    "fire",
+    "rotation",
+    60,
+    BABYLON.Animation.ANIMATIONTYPE_VECTOR3,
+    BABYLON.Animation.ANIMATIONLOOPMODE_CONSTANT);
+
+    // Animations keys
+    var keys = [{
+        frame: 0,
+        value: start
+    },{
+        frame: 10,
+        value: end
+    },{
+        frame: 100,
+        value: start
+    }];
+
+    // Add these keys to the animation
+    display.setKeys(keys);
+
+    // Link the animation to the mesh
+    this.mesh.animations.push(display);
+
+    // Run the animation !
+    var _this = this;
+    this.game.scene.beginAnimation(this.mesh, 0, 100, false, 10);
+}
+</code></pre>
+
+    <h2>The arena</h2>
+
+    <p>
+        Our arena is very simple: it's only a ground ! But if you create your own shooter game, a ground won't be enough.
+        In this class, you will surely add trees, walls, houses, and so on.
+    </p>
+
+<pre><code class="js">
+// The ground
+var ground = BABYLON.Mesh.CreateGround("ground",  this.size,  this.size, 2, this.game.scene);
+ground.checkCollisions = true;
+</code></pre>
+
+    <p>
+        We will now add a minimap on the screen. This minimap will be a new camera, located above the player head and showing
+        everything happening in the arena.
+    </p>
+
+    <h2>The minimap</h2>
+
+    <p>
+        The minimap will use a cool feature of Babylon: <a href="https://github.com/BabylonJS/Babylon.js/wiki/How-to-use-multi-views">multi-views and viewports</a>.
+        In a Babylon game, you can have many active cameras, each one looking at a different point of view.<br/>
+        But first, let's create a new FreeCamera. This camera will use the orthographic mode (whereas all created cameras use a perspective mode by default).
+        If you don't know it yet, here is an image showing the same scene with 2 differents modes:
+    </p>
+        <div class="centerImg centerImgBig">
+            <img src="img/ortho.png" />
+        </div>
+    <p>
+        Orthographic mode is used to represent 3D objects in two dimensions, thus giving our scene a 2D aspect. Perfect for the minimap !
+    </p>
+
+<pre><code class="js">
+var mm = new BABYLON.FreeCamera("minimap", new BABYLON.Vector3(0,100,0), this.game.scene);
+mm.setTarget(new BABYLON.Vector3(0.1,0.1,0.1));
+// Activate the orthographic projection
+mm.mode = BABYLON.Camera.ORTHOGRAPHIC_CAMERA;
+
+//These values are required for using an orthographic mode,
+// and represents the coordinates of the square containing all the camera view.
+// this.size is the size of our arena
+mm.orthoLeft = -this.size/2;
+mm.orthoRight = this.size/2;
+mm.orthoTop =  this.size/2;
+mm.orthoBottom = -this.size/2;
+
+mm.rotation.x = Math.PI/2;
+</code></pre>
+
+    <p>
+        Now our minimap is define, we must add it a viewport. A viewport is the part of the screen where our minimap will be shown.
+        In our case, we want it in the top right of the screen.
+    </p>
+
+<pre><code class="js">
+var xstart = 0.8, // 80% from the left
+    ystart = 0.75; // 75% from the bottom
+var width = 0.99-xstart, // Almost until the right edge of the screen
+    height = 1-ystart;  // Until the top edge of the screen
+
+mm.viewport = new BABYLON.Viewport(
+    xstart,
+    ystart,
+    width,
+    height
+    );
+
+// Add the camera to the list of active cameras of the game
+this.game.scene.activeCameras.push(mm);
+</code></pre>
+
+    <h2>Layer masks</h2>
+
+    <p>
+        Finally, we dont want to see the weapon mesh on our minimap. Instead, we want to see a red dot for the player. It will be easier for him
+        to know where he is going. To implement this, we will use <b>camera layers masks</b>. They can be used to selectively filter game objects.
+    </p>
+
+    <p>
+        How do they work ? It's easy: it's a AND operation between two binary numbers. If the result number is 0, the mesh won't be seen for this camera.
+        By default, the layer mask for all meshes and all cameras is 0xFFFFFFFF (1111111111111111111111111111 in binary).
+        Let's take an example, and set a custom layer mask for our minimap:
+    </p>
+<pre><code class="js">
+mm.layerMask = 1; // 001 in binary
+</code></pre>
+
+    <p>
+        If a mesh has a layer mask equals to 2 (010 in binary), then 001 & 010 = 0 in binary : this mesh won't be displayed on this camera.
+        It's exactly what we are going to do for our player.<br/>
+        In the minimap, the player will be represented by a red sphere. So, in the class Player:
+    </p>
+<pre><code class="js">
+this.camera.layerMask = 2; // 010 in binary
+
+// The representation of player in the minimap
+var s = BABYLON.Mesh.CreateSphere("player2", 16, 4, this.scene);
+s.position.y = 10;
+// The sphere position will be displayed accordingly to the player position
+s.registerBeforeRender(function() {
+    s.position.x = _this.camera.position.x;
+    s.position.z = _this.camera.position.z;
+});
+
+var red = new BABYLON.StandardMaterial("red", this.scene);
+red.diffuseColor = BABYLON.Color3.Red();
+red.specularColor = BABYLON.Color3.Black();
+s.material = red;
+
+s.layerMask = 1; // 001 in binary : won't be displayed on the player camera, only in the minimap
+</code></pre>
+
+
+<h2>Conclusion</h2>
+<p>
+    Your game is now started ! Feel free to copy-paste the complete source code and start your own shooter game, with moving targets, several weapons, bonus,...
+    And show me your finished game, I will be happy to play it :)
+    <br/><a href="game/index.html">Click here to run the shooter demo</a>,
+    or <span class="purple">click on the image below to get the final code source</span> if you want to take a look at it.<br/>
+<div class="centerImg" style="padding:0">
+    <a href="zip/shooter.zip">
+        <img class="shadow" src="/img/games.png" style="width:150px"/>
+    </a>
+</div>
+</p>
+<hr/>
+
+<p>
+    If you have any questions about it, feel free to email me at <span class="purple">temechon <code>[at]</code> pixelcodr <code>[dot]</code> com</span>, or leave a comment below,
+    I'll answer quickly. <br/>You can also <a href="http://eepurl.com/ZlBTX">subscribe to the newsletter</a> and you will receive an email when a new tutorial is out. No spam, and unsubscribe whenever you want.
+    <br/><br/>
+    Cheers !
+</p>
+</div></div></div></div></body></html>

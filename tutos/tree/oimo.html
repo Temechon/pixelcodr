@@ -1,0 +1,337 @@
+<!DOCTYPE html><html lang="en"><head><title></title><link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css"><link rel="stylesheet" href="//cdn.jsdelivr.net/flexboxgrid/6.3.0/flexboxgrid.min.css" type="text/css"><link href="https://fonts.googleapis.com/css?family=Oswald" rel="stylesheet" type="text/css"><link href="https://fonts.googleapis.com/css?family=Montserrat" rel="stylesheet" type="text/css"><link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400" rel="stylesheet" type="text/css"><link rel="stylesheet" href="/css/main.css"></head><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.0.0/styles/zenburn.min.css"><script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.0.0/highlight.min.js"></script><script>hljs.initHighlightingOnLoad();
+</script><body><div class="wrapper"><!--Menu--><div class="menu"><div class="menu-content"><div class="name">Julian</div><div class="name">"Temechon"</div><div class="items"><div class="item"><a href="/projects.html"><i class="fa fa-gamepad"></i>Projects</a></div><div class="item"><a href="/tutorials.html"><i class="fa fa-graduation-cap"></i>Babylon.js tutorials</a></div><div class="item"><a href="https://github.com/Temechon" target="_new"><i class="fa fa-github"></i>Github</a></div><div class="item"><a href="/aboutme.html"><i class="fa fa-user"></i>About me</a></div><div class="item"><a href="http://learningbabylonjs.com/" target="_new"><i class="fa fa-rocket"></i>Learning Babylon.js</a></div></div></div></div><!-- Content--><div class="right-space"><div class="content"><h1>Oimo - How to use a new Physics plugin</h1><div class="tutorial">
+    <h2>Oimo - How to use a new Physics plugin </h2>
+
+    <div style="text-align:center; padding-top:40px; padding-bottom: 40px">
+        <img src="/img/logos/babylonjs.png" style="max-height:75px;" />
+        <img src="/img/logos/logo_oimo.png" style="max-height:75px;" />
+        <img src="/img/logos/html5.png" style="max-height:75px;" /><br/>
+    </div>
+    <p>
+
+    </p>
+    <p>
+        To understand this tutorial, you should have some experience with Babylon.js or completed my
+        <a href="../toad_attack/toad_attack.html">first tutorial</a>.
+    </p>
+
+    <h2>Objective</h2>
+    <p>
+        In this tutorial, we will try to use a new physics plugin : <a href="http://lo-th.github.io/Oimo.js/">Oimo.js.</a> <br/>
+        As you may know, Babylon.js use a plugin system to work with physics. This means if a new physics engine comes out, it can easily
+        be added into Babylon.<br/>
+        I created this plugin because I was not totally convinced by the current one (cannon.js) in terms of performance, and I wanted to try
+        the new plugin system. Anyway, this time it will not be a game prototype, but a technical demo of Oimo.js with Babylon.<br/>
+        In this page, I will assume you know how to use basic components of Babylon.js (but if you completed my two first tutorials,
+        you will be fine) :)<br/>
+
+        Let's start !
+    </p>
+
+    <h2>What you will create</h2>
+
+    <p>Click on the image to run the demo. It's a simple platform with some falling cubes and spheres. A gradient shader is used for the skydome and for the material on the cubes.
+    I will of course explain all of this.<br/>
+    Click on the image below or <a href="game/index.html">here to run the physics demo.</a>
+    </p>
+    <div class=" centerImg centerImgBig">
+        <a href="game/index.html"><img src="img/final.png" /></a>
+    </div>
+
+    <h2>The environment</h2>
+
+    <p>Our environment is composed of two things :
+    <ul>
+        <li>a skydome</li>
+        <li>a platform</li>
+    </ul>
+    The platform is only a box with a texture on it, nothing too fancy.<br/>
+    The skydome is only a big sphere with backface culling activated (this means the material will be applied on the sphere
+    and INSIDE of it. The particularity of this skydome is its material : it will be a <span class="purple">gradient shader.</span><br/>
+    </p>
+
+    <h2>A shader ?</h2>
+    <p>A shader is a common component in 3D games. It's a computer program used to compute the position and the appropriate level of color for a given model.
+    They can be used to create specials effects with a great performance.<br/>
+    I could make an whole article on shaders, how they works, what they can do, but for now we will try to use them within Babylon.<br/>
+    What you should keep in mind is:
+    <ul>
+        <li>A shader is computed by the GPU (graphic card), so it's very very fast</li>
+        <li>A shader is actually files: a vertex shader and a fragment shader</li>
+        <li>The vertex shader computes the position of each vertex of a given mesh</li>
+        <li>The fragment shader computes the color applied on each vertex</li>
+        <li>the variable <code>gl_Position</code> is computed in the vertex shader, and <code>gl_FragColor</code> is computed
+        in the fragment shader</li>
+    </ul>
+    <a href="http://www.babylonjs.com/cyos/">You can see some shader in action here</a>, by using the tool Create Your Own Shader (CYOS).<br/>
+    How can you use it in Babylon ? It's simple: <code>BABYLON.ShaderMaterial</code>!
+    </p>
+
+    <p>A ShaderMaterial is just a normal material linked to the vertex shader and to the fragment shader. By working with CYOS,
+        I created a gradient shader : this shader apply two colors (top Color and bottomColor) on the mesh.
+    Nothing is done in the vertex shader, because I don't want to update the position of my vertex.</p>
+    <pre><code class="c">
+precision mediump float;
+
+// Attributes
+attribute vec3 position;
+attribute vec3 normal;
+attribute vec2 uv;
+
+// Uniforms
+uniform mat4 worldViewProjection;
+
+// Varying
+varying vec4 vPosition;
+varying vec3 vNormal;
+
+void main() {
+
+    vec4 p = vec4( position, 1. );
+    vPosition = p;
+    vNormal = normal;
+    gl_Position = worldViewProjection * p;
+
+}
+    </code></pre>
+    <p>However, the magic is done in the fragment shader. The two colors are retrieved from 'uniforms' parameters (uniforms are
+    data given as input to the shader, you will see it later), mixed up and applied to the mesh automatically.</p>
+    <pre><code class="js">
+precision mediump float;
+
+uniform mat4 worldView;
+varying vec4 vPosition;
+varying vec3 vNormal;
+
+// PARAMETER GIVEN IN THE JS CODE //
+// Offset position
+uniform float offset;
+// Exponent
+uniform float exponent;
+// Colors
+uniform vec3 topColor;
+uniform vec3 bottomColor;
+
+void main(void) {
+    float h = normalize(vPosition + offset).y;
+    gl_FragColor = vec4( mix(bottomColor, topColor, max(pow(max(h, 0.0), exponent), 0.0)), 1.0 );
+}
+    </code></pre>
+<p>
+    These two shaders should be saved in two files (<code>gradient.vertex.fx</code> for the vertex shader,
+    and <code>gradient.fragment.fx</code> for our fragment shader) and
+    put in a specific folder of our demo, let's call it 'shaders' (very simple, isn't it ?).<br/>
+    <a href="http://www.babylonjs.com/cyos/#LFNPG">Click here if you want to try the gradient shader.</a>
+</p>
+
+    <h2>The skydome</h2>
+    <p>
+        We should now apply our shader on our skydome, with two colors.
+    </p>
+<pre><code class="js">
+/** SKYBOX **/
+BABYLON.Engine.ShadersRepository = "shaders/";
+
+var skybox = BABYLON.Mesh.CreateSphere("skyBox", 10, 2500, scene);
+
+var shader = new BABYLON.ShaderMaterial("gradient", scene, "gradient", {});
+shader.setFloat("offset", 0);
+shader.setFloat("exponent", 0.6);
+shader.setColor3("topColor", BABYLON.Color3.FromInts(0,119,255));
+shader.setColor3("bottomColor", BABYLON.Color3.FromInts(240,240, 255));
+shader.backFaceCulling = false;
+skybox.material = shader;
+</code></pre>
+    <p>
+        The first line is here to indicate to Babylon the folder containing our shaders, and the second one creates our skydome
+        (remember ? A biiig sphere). But let's give a closer look at the shader creation.
+    </p>
+    <pre><code class="js">
+var shader = new BABYLON.ShaderMaterial("gradient", scene, "gradient", {});
+    </code></pre>
+    <p>
+        Here, 4 parameters :
+        <ul>
+            <li>The shader name</li>
+            <li>The game scene</li>
+            <li>The shader file name - We called our files <code><b>gradient</b>.vertex.fx</code>, remember ?</li>
+            <li>A set of options linked to our shader.</li>
+        </ul>
+    </p>
+
+    <p>In  the next 4 lines, I give 4 parameters to my shader (used in the fragment shader):</p>
+    <pre><code class="js">
+shader.setFloat("offset", 0);
+shader.setFloat("exponent", 0.6);
+shader.setColor3("topColor", BABYLON.Color3.FromInts(0,119,255));
+shader.setColor3("bottomColor", BABYLON.Color3.FromInts(240,240, 255));
+    </code></pre>
+<p>A BABYLON.ShaderMaterial contains several methods do give parameters to the shaders (the variables called 'uniforms' -
+not to be confused with <a href="http://i.imgur.com/zv9TA.jpg">unicorns</a>). You should know that Babylon gives some variables by default to all shaders:
+<ul>
+        <li>world - The world matrix</li>
+        <li>view - The scene view matrix</li>
+        <li>worldView - The scene view matrix in the world</li>
+        <li>projection - The scene projection matrix</li>
+        <li>worldViewProjection - The world view projection matrix</li>
+</ul>
+    All others uniforms variables should be added with the corresponding method 'setXXXX' where XXXX is the type of the uniform.
+    <br/>
+    Here, 4 uniforms are not in this list: offset (a float), exponent (a float), topColor (a color), bottomColor (a color). These variables are all
+    given to the shader.
+    </p>
+    <p>Finally, this line will apply the shader material on the inside of the sphere.<br/>
+    Add a camera and an hemispheric light, and you have your skydome !</p>
+
+<pre><code class="js">
+    shader.backFaceCulling = false;
+</code></pre>
+    <div class="centerImg"><img src="img/skydome.png" /></div>
+
+    <h2>The platform</h2>
+    <p>
+        The platform is just a box scaled along the y-axis, with a ground texture. Here is the code :
+    </p>
+    <pre><code class="js">
+/** GROUND **/
+
+// Material
+var mat = new BABYLON.StandardMaterial("ground", scene);
+var t = new BABYLON.Texture("img/ground3.jpg", scene);
+t.uScale = t.vScale = 10;
+mat.diffuseTexture = t;
+mat.specularColor = BABYLON.Color3.Black();
+
+// Object
+var g = BABYLON.Mesh.CreateBox("ground", 400, scene);
+g.position.y = -20;
+g.scaling.y = 0.01;
+
+g.material = mat;
+    </code></pre>
+
+    <div class="centerImg">
+        <img src="img/ground.png" />
+    </div>
+
+    <h2>Cubes and spheres </h2>
+
+    <p>
+        A loop is used to create all objects: spheres and cubes. The function <code>getPosition</code>
+        is a function creating a Vector3 with A random position in X and Z.
+    </p>
+    <pre><code class="js">
+// SPHERES
+var s = BABYLON.Mesh.CreateSphere("s", 30, randomNumber(20, 30), scene);
+s.position = getPosition(y);
+var matSphere = new BABYLON.StandardMaterial("boxmat", scene);
+matSphere.diffuseColor = BABYLON.Color3.FromInts(75, 71, 89);
+matSphere.specularColor = BABYLON.Color3.Black();
+s.material = matSphere;
+    </code></pre>
+    <p>
+        For the box, the same shader as the skydome is used, but with two differents colors.<br/>
+        All boxes are given a random rotation.
+    </p>
+    <pre><code class="js">
+// BOXES
+var d = BABYLON.Mesh.CreateBox("s", randomNumber(10, 20), scene);
+d.position = getPosition(y);
+var shaderBox = new BABYLON.ShaderMaterial("gradient", scene, "gradient", {});
+shaderBox.setFloat("offset", 10);
+shaderBox.setFloat("exponent", 1.0);
+shaderBox.setColor3("topColor", BABYLON.Color3.FromInts(129,121,153));
+shaderBox.setColor3("bottomColor", BABYLON.Color3.FromInts(161,152, 191));
+d.material = shaderBox;
+
+// Random rotation
+d.rotation.x = randomNumber(-Math.PI/2, Math.PI/2);
+d.rotation.y = randomNumber(-Math.PI/2, Math.PI/2);
+d.rotation.z = randomNumber(-Math.PI/2, Math.PI/2);
+    </code></pre>
+
+    <p>And finally, all objects are saved in an array to be used later.</p>
+    <pre><code class="js">
+// SAVE OBJECT
+objects.push(s, d);
+// INCREMENT HEIGHT
+y+=10;
+    </code></pre>
+    <p>
+        Finally, a small condition is added in the render loop: if the mesh falls below -100 units,
+        a new random position is computed above the ground.
+    </p>
+<pre><code class="js">
+scene.registerBeforeRender(function() {
+    objects.forEach(function(obj) {
+        // If object falls
+        if (obj.position.y < -100) {
+            obj.position = getPosition(200);
+        }
+    });
+});
+</code></pre>
+    <div class="centerImg"><img src="img/objects.png"/></div>
+
+    <p>
+       And now, the magic: the physics engine !
+    </p>
+
+    <h2>How to activate the physics engine</h2>
+    <p>
+        First, you have to activate the physics engine and tell Babylon.js which plugin you will use. Only one plugin
+        can be used in one scene, so choose carefully :) Here, we use a <code>OimoJsPlugin</code>.
+    </p>
+        <pre><code class="js">
+scene = new BABYLON.Scene(engine);
+scene.enablePhysics(new BABYLON.Vector3(0,-10,0), new BABYLON.OimoJSPlugin());
+        </code></pre>
+    <p>
+    And that's it ! The physics engine is activated !
+    </p>
+    <p>Now, some physics properties should be added to our ground.
+        To add a physics state, just add this line:</p>
+
+    <pre><code class="js">
+g.setPhysicsState({ impostor: BABYLON.PhysicsEngine.BoxImpostor, move:false});
+    </code></pre>
+    <p>The object given in parameter to <code>setPhysicsState</code> contains 2 attributes :
+    <ul>
+        <li><code>impostor</code> - The physics impostor. Currently, only 3 are supported with Oimo.js : Sphere, Box and Plane</li>
+        <li><code>move</code> - Is this object should move ? If yes, set it to true. </li>
+    </ul>
+    Several other attributes can be added in this object:
+    <ul>
+        <li>mass - The object mass</li>
+        <li>friction - The object friction attribute</li>
+        <li>restitution - The object restitution attribute</li>
+    </ul>
+    </p>
+
+    <p>
+        We want spheres to bounce a little bit more than cubes. We can set it with the attribute <code>restitution</code>:
+    </p>
+    <pre><code class="js">
+s.setPhysicsState({impostor:BABYLON.PhysicsEngine.SphereImpostor, move:true, mass:1, friction:0.5, restitution:<b>0.5</b>});
+d.setPhysicsState({impostor:BABYLON.PhysicsEngine.BoxImpostor, move:true, mass:1, friction:0.5, restitution:0.1});
+    </code></pre>
+
+    <h2>What's next ?</h2>
+    <p>
+        <span class="purple">Click on the image below to get the final code source</span> if you want to take a look at it. I updated/add several things in it, but feel free to
+        modify it as you wish.<br/>
+    <div class="centerImg" style="padding:0">
+        <a href="zip/oimo.zip">
+            <img class="shadow" src="/img/games.png" style="width:150px"/>
+        </a>
+    </div>
+    </p>
+    <hr/>
+
+    <p>
+        If you have any questions about it, feel free to email me at <span class="purple">temechon <code>[at]</code> pixelcodr <code>[dot]</code> com</span>, or leave a comment below,
+        I'll answer quickly. <br/>You can also <a href="http://eepurl.com/ZlBTX">subscribe to the newsletter</a> and you will receive an email when a new tutorial is out. No spam, and unsubscribe whenever you want.
+        <br/><br/>
+        Cheers !
+    </p>
+</div></div></div></div></body></html>

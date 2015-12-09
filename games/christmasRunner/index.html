@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<head>
+	<link rel="stylesheet" type="text/css" href="css/main.css" />
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css">
+    <!--Libs-->
+    <script src="js/libs/babylon/babylon.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="msapplication-tap-highlight" content="no" />
+
+    <!--Game-->
+    <script src="js/Game.js"></script>
+    <script src="js/GameObject.js"></script>
+    <script src="js/Player.js"></script>
+    <script src="js/Lanes.js"></script>
+    <script src="js/SapinouManager.js"></script>
+    <script src="js/ObstacleManager.js"></script>
+    <script src="js/Gift.js"></script>
+
+</head>
+<body>
+
+    <div class="wrapper">
+        <div class="orientationWrapper">
+            Please turn your device in landscape mode
+        </div>
+
+
+        <div class="contentWrapper">
+            <div class="title">Christmas runner</div>
+
+            <div class="subtitle top">Collect as many gifts as you can !</div>
+            <div class="play">play</div>
+            <div class="play playRipple"></div>
+            <div class="subtitle bottom">
+                Play with arrow keys to move left or right
+                <br/>Space to jump
+            </div>
+
+            <div class="author">
+                Made with <i class="fa fa-heart"></i> by <a href="http://twitter.com/Temechon">Julian</a>, (3D assets by <a href="http://twitter.com/jbledowski">JB</a> and Sarah)<br/>
+                Powered by <a class="red" href="http://www.babylonjs.com">Babylon.js</a>
+            </div>
+
+        </div>
+    </div>
+    <div class="ready">
+        Space to start!
+    </div>
+
+    <div class="score">
+        0
+    </div>
+	<canvas id="renderCanvas"></canvas>
+
+    <div class="lost">
+    </div>
+	
+</body>
+<!-- Piwik -->
+<script type="text/javascript">
+    var _paq = _paq || [];
+    _paq.push(['trackPageView']);
+    _paq.push(['enableLinkTracking']);
+    (function() {
+        var u="//pixelcodr.com/analytics/";
+        _paq.push(['setTrackerUrl', u+'piwik.php']);
+        _paq.push(['setSiteId', 1]);
+        var d=document, g=d.createElement('script'), s=d.getElementsByTagName('script')[0];
+        g.type='text/javascript'; g.async=true; g.defer=true; g.src=u+'piwik.js'; s.parentNode.insertBefore(g,s);
+    })();
+</script>
+<noscript><p><img src="//pixelcodr.com/analytics/piwik.php?idsite=1" style="border:0;" alt="" /></p></noscript>
+<!-- End Piwik Code -->
+<script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/hammer.js/2.0.4/hammer.min.js"></script>
+<script src="js/scripts/home.js"></script>
+</html>

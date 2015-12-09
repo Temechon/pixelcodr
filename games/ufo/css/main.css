@@ -1,0 +1,11 @@
+body
+{
+    /*background-color:#0b0d17;*/
+    background-color:#E1EBF5;
+}
+
+#selectedGem {
+    position:absolute;
+    top : 100px;
+    left:150px;
+}

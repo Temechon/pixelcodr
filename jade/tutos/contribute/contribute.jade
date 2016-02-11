@@ -1,0 +1,71 @@
+doctype html
+html(lang="en")
+    include ../../include/header.jade
+    link(rel='stylesheet', href='https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.0.0/styles/zenburn.min.css')
+    script(src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.0.0/highlight.min.js")
+    script.
+        hljs.initHighlightingOnLoad();
+
+    body
+
+        .wrapper
+            //Menu
+            include ../../include/menu.jade 
+
+            // Content
+            .right-space
+                .content
+                    h1 How to contribute to Babylon.js
+
+                    .tutorial
+                        h2 Starting somewhere
+                        p.
+                            As you surely know, Babylon.js is an open-source 3D engine, where the source code can be 
+                            <a target="_new" href="https://github.com/BabylonJS/Babylon.js">found on Github</a>.
+                            The full list of all glorious contributors <a target="_new" href="https://github.com/BabylonJS/Babylon.js/graphs/contributors">
+                            is also available on Github.</a>
+                            If you also want to be part of this adventure and join this list, you're in the right place :)
+                            But what "contributing" means exactly ?
+                        
+                        p.
+                            It means that each one of them have a sample of their code in the engine itself: a new feature, a bug fix, a new material, 
+                            a new demo showing the full potential of a specific feature... If your code is good, useful and can be easily used, it's only 
+                            a matter of time before your pull request will be accepted.
+                            
+                        h2 Where to contribute ?
+                        p.
+                            You can contribute to several places:
+                        ul
+                            li.
+                                <a href="https://github.com/BabylonJS/Documentation">The documentation</a>         
+                            li.
+                                <a href="https://github.com/BabylonJS/Extensions">The list of extensions</a>    
+                            li.
+                                <a href="https://github.com/BabylonJS/UserFunctions">A list of useful functions</a>    
+                            li.
+                                <a href="https://github.com/BabylonJS/MeshesLibrary">A list of useful placeholder meshes</a>  
+                            li.
+                                <a href="https://github.com/BabylonJS/Babylon.js">And the 3D engine of course</a>    
+                                    
+                        p.
+                            Each one of these projects is a Github project, with its own rules you have to follow.
+                            
+                        p.
+                            In this tutorial, we will learn how to configure a local project in order to be ready to contribute to the official 
+                            engine. Several things will be aborded: 
+                        ul
+                            li The project code conventions
+                            li How to fork and clone a project
+                            li How to setup your local copy to compile the engine
+                            li How to create a new pull request   
+                                                    
+                        p. 
+                            I will use the awesome editor Visual Studio Code to edit, commit and push my changes on the repository. VSCode 
+                            <a href="https://code.visualstudio.com/">can be found here.</a> 
+                            
+                        
+                            
+                        
+                            
+        include ../../include/footer.jade
+

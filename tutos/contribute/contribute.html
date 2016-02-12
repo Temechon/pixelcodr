@@ -1,5 +1,5 @@
 <!DOCTYPE html><html lang="en"><head><title></title><meta charset="utf-8"><link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css"><link rel="stylesheet" href="//cdn.jsdelivr.net/flexboxgrid/6.3.0/flexboxgrid.min.css" type="text/css"><link href="https://fonts.googleapis.com/css?family=Oswald" rel="stylesheet" type="text/css"><link href="https://fonts.googleapis.com/css?family=Montserrat" rel="stylesheet" type="text/css"><link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400" rel="stylesheet" type="text/css"><link rel="stylesheet" href="/css/main.css"></head><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.0.0/styles/zenburn.min.css"><script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.0.0/highlight.min.js"></script><script>hljs.initHighlightingOnLoad();
-</script><body><div class="wrapper"><!--Menu--><div class="menu"><div class="menu-content"><div class="name">Julian</div><div class="name">"Temechon"</div><div class="items"><div class="item"><a href="/projects.html"><i class="fa fa-gamepad"></i>Projects</a></div><div class="item"><a href="/tutorials.html"><i class="fa fa-graduation-cap"></i>Babylon.js tutorials</a></div><div class="item"><a href="https://github.com/Temechon" target="_new"><i class="fa fa-github"></i>Github</a></div><div class="item"><a href="/aboutme.html"><i class="fa fa-user"></i>About me</a></div><div class="item"><a href="http://learningbabylonjs.com/" target="_new"><i class="fa fa-rocket"></i>Learning Babylon.js</a></div></div></div></div><!-- Content--><div class="right-space"><div class="content"><h1>How to contribute to Babylon.js</h1><div class="tutorial"><h2>Starting somewhere</h2><p>As you surely know, Babylon.js is an open-source 3D engine, where the source code can be 
+</script><body><div class="wrapper"><!--Menu--><div class="menu"><div class="menu-content"><div class="name">Julian</div><div class="name">CHENARD</div><div class="items"><div class="item"><a href="/projects.html"><i class="fa fa-gamepad"></i>Projects</a></div><div class="item"><a href="/tutorials.html"><i class="fa fa-graduation-cap"></i>Babylon.js tutorials</a></div><div class="item"><a href="https://github.com/Temechon" target="_new"><i class="fa fa-github"></i>Github</a></div><div class="item"><a href="/aboutme.html"><i class="fa fa-user"></i>About me</a></div><div class="item"><a href="http://learningbabylonjs.com/" target="_new"><i class="fa fa-rocket"></i>Learning Babylon.js</a></div></div></div></div><!-- Content--><div class="right-space"><div class="content"><h1>How to contribute to Babylon.js</h1><div class="tutorial"><h2>Starting somewhere</h2><p>As you surely know, Babylon.js is an open-source 3D engine, where the source code can be 
 <a target="_new" href="https://github.com/BabylonJS/Babylon.js">found on Github</a>.
 The full list of all glorious contributors <a target="_new" href="https://github.com/BabylonJS/Babylon.js/graphs/contributors">
 is also available on Github.</a>
@@ -11,11 +11,82 @@ a matter of time before your pull request will be accepted.
 </p><h2>Where to contribute ?</h2><p>You can contribute to several places:</p><ul><li><a href="https://github.com/BabylonJS/Documentation">The documentation</a>         </li><li><a href="https://github.com/BabylonJS/Extensions">The list of extensions</a>    </li><li><a href="https://github.com/BabylonJS/UserFunctions">A list of useful functions</a>    </li><li><a href="https://github.com/BabylonJS/MeshesLibrary">A list of useful placeholder meshes</a>  </li><li><a href="https://github.com/BabylonJS/Babylon.js">And the 3D engine of course</a>    
     </li></ul><p>Each one of these projects is a Github project, with its own rules you have to follow.
 </p><p>In this tutorial, we will learn how to configure a local project in order to be ready to contribute to the official 
-engine. Several things will be aborded: </p><ul><li>The project code conventions</li><li>How to fork and clone a project</li><li>How to setup your local copy to compile the engine</li><li>How to create a new pull request   </li></ul><p>I will use the awesome editor Visual Studio Code to edit, commit and push my changes on the repository. VSCode 
-<a href="https://code.visualstudio.com/">can be found here.</a> 
-
-
-
+engine. Several things will be aborded: </p><ul><li>Create a Github account</li><li>How to fork and clone a project</li><li>How to setup your local copy to compile the engine with Visual Studio</li><li>The project code conventions</li><li>How to create a new pull request   </li></ul><p>I will use the awesome editor Visual Studio Code to edit and compile the project. VSCode 
+<a href="https://code.visualstudio.com/">can be found here.</a> Let's start!
+</p><h2>Git and Github</h2><p>Babylon.js repository is located on Github. That means in order to contribute, you first have to create a free Github account.
+To do so, go to <a href="">github.com</a>, and fill the form with your account name, mail and password.</p><div class="centerImg centerImgSmall"><img src="/img/contribute/github.jpg"></div><p>Once your account is created and validated, you can browse to the <a href="https://github.com/BabylonJS/Babylon.js">project homepage</a>.
+On this page, you can find several information:</p><div class="centerImg centerImgBig"><img src="/img/contribute/github2.jpg"></div><p>Let's  explain the top right buttons on this screen:</p><ul><li>The button "Watch" is used to toggle changes notifications on this project.</li><li>The button "Star" is used to check the popularity of a project. You can give a star to Babylon.js if you want to help it spread around the world!</li><li>The button "Fork" is used to create your own local copy of this project.</li></ul><h2>How to fork and clone the project</h2><p>The first thing to do is to fork the project. Forking a project will create 
+your own copy of the project. That means you can do whatever you want in your copy of 
+Babylon.js without affecting the main repository :) Awesome right ? So let's fork Babylon.js.
+</p><p>After the nice animation is finished, you probably noticed the name of the project changed.</p><div class="centerImg centerImgSmall"><img src="/img/contribute/github3.jpg"></div><p>That means you're in your local copy! Congrats :) Let's go to the next step.
+</p><h2>Clone the project, and using the git command line</h2><p>Back to your computer! Before doing anything, you have to setup the softwares listed below. This tutorial won't describe how to 
+install it, as it's veeeery easy to do it :)</p><ul><li><a target='_new' href="https://nodejs.org/en/">Node.js</a></li><li><a target='_new' href="https://git-scm.com/">Git</a></li><li><a target='_new' href="https://code.visualstudio.com/">Visual Studio</a></li><li>Strongly recommended, but not mandatory: <a target='_new' href="http://cmder.net/">Cmder</a></li></ul><p>Open cmder (or your new git bash), and type the following command:</p><pre><code class="bash">> node -v
+    v5.2.0
+> npm -v
+    v3.3.12</code></pre><p>Now, go to the directory you want to have your project, and type the clone command. Replace <i>Temechon</i> by your Github account name:</p><pre><code class="bash">> git clone https://github.com/Temechon/Babylon.js.git</code></pre><p>The whole project will be retrieved on your computer. Keep in mind you are retrieving your <i>fork</i> of the project, not 
+the official one.</p><div class="centerImg"><img src="/img/contribute/fork1.jpg"></div><h2>Synchronize your fork with the official repo - Create an upstream link</h2><p>An upstream link will help you retrieve all last changes from the official Babylon.js project.
+For this, we will follow <a target="_new" href="https://help.github.com/articles/configuring-a-remote-for-a-fork/">this github tutorial:</a></p><pre><code class="bash">> cd Babylon.js
+> git remote -v
+    origin  https://github.com/Temechon/Babylon.js.git (fetch)
+    origin  https://github.com/Temechon/Babylon.js.git (push)
+> git remote add upstream https://github.com/BabylonJS/Babylon.js.git
+> git remote -v
+    origin  https://github.com/Temechon/Babylon.js.git (fetch)
+    origin  https://github.com/Temechon/Babylon.js.git (push)
+    upstream        https://github.com/BabylonJS/Babylon.js.git (fetch)
+    upstream        https://github.com/BabylonJS/Babylon.js.git (push)
+</code></pre><h2>Fetch the very last version</h2><p>Ok! Now you're ready to retrieve all changes from the official repo. Each time you want to add a new feature, a bug fix, anything, you 
+have to ensure you are working on the very last version. 
+To do this, follow this <a target="_new" href="https://help.github.com/articles/syncing-a-fork/">Github tutorial</a>:</p><pre><code class="bash">> git fetch upstream
+> git checkout master
+> git merge upstream/master
+</code></pre><p>And you're done! Now, let's setup the IDE and try to compile the project.
+</p><h2>Install packages</h2><p>In order to be able to compile, you have to install all needed packages. For this, we use the power of Node Package Manager. 
+First, we install gulp globally (-g), and install all needed packages for this project:</p><pre><code class="bash">> npm install -g gulp
+> cd Tools/Gulp
+> npm install
+</code></pre><p>A lot of lines will be written... It may take a while, depending on your computer and the network speed. Go grab a coffee during this time :)
+</p><h2>Setup Visual Studio Code </h2><p>With VS Code, you can directly open the Babylon.js folder. Now we just have to configure the task runner of VSCode and we're done!
+</p><h3>The task runner</h3><p>In order to configure the task runner, press CTRL+SHIFT+P, and type config. you should have this line highlighted. Press enter:</p><div class="centerImg"><img src="/img/contribute/vscode1.jpg"></div><p>The file <i>tasks.json</i> opens in edit mode. You can delete everything is paste this:</p><pre><code class="json">{
+    "version": "0.1.0",
+    "command": "gulp",
+    "options": {
+        "cwd": "${workspaceRoot}/Tools/Gulp"
+    },
+    "isShellCommand": true,
+    "tasks": [
+        {
+            "taskName": "typescript",
+            // Make this the default build command.
+            "isBuildCommand": true
+        },
+        {
+            "taskName": "default",
+            "isBuildCommand": false
+        },
+        {
+            "taskName": "watch-typescript",
+            "isBuildCommand": false
+        }
+    ]
+}</code></pre><p>Save it. Now your VSCode is configured :) You can press CTRL+SHIFT+B in order to compile all TypeScript files.
+</p><h2>The project code conventions</h2><p>Now that you're ready to add your own code, please read and follow the 
+<a target="_new" href="http://doc.babylonjs.com/generals/Approved_Naming_Conventions">project code conventions.</a>
+If you don't follow these simple rules, your pull request may not be approved.
+</p><h2>Commit and push</h2><p>Once your new feature is developped and tested, you can commit and push to your repository.
+You can commit and push within VSCode, but you first have to tell him to remember your Github credentials. Otherwise, 
+the 'push' command will be stucked and will run forever.
+Open your cmder (or the git bash), and use this:</p><pre><code class="bash">> git config --global credential.helper wincred</code></pre><p><a target="_new" href="http://stackoverflow.com/questions/15381198/remove-credentials-from-git/15382950#15382950">You can learn more about it here.</a>
+</p><p>Back to VSCode! By clicking on the Git icon (on the left), you can see how many changes have been done on the repo.
+You can click on the '+' icon to stage them, and specify a commit message for each one of them. CTRL+Enter to commit.
+When every file has its commit message, clic on the push button.
+This will send all your modifications to <b>your fork.</b> Now, we have to send it to the official repository \o/
+</p><h2>Create a pull request</h2><p>Everything happens on Github! Connect to your account, and go to your Babylon.js fork. Can you see this little greeny button over there?
+</p><div class="centerImg centerImgSmall"><img src="/img/contribute/pr1.jpg"></div><p>You can click on it. Github will show all change you want to push to the official repo. Check this, and if you are sure, click on the button 
+'Create Pull Request'. Leave a small message, and confirm.
+The pull request will be automatically be checked by Travis, and manually reviewed by Babylon.js team. We are very reactive, and a pull request never stay 
+uncommented for too long :)
+</p><h2>Now what ?                            </h2><p>Yay! You pushed a new feature in the official repository. You are now an official contributor! Congrats :)
 
 </p></div></div></div></div><!-- Piwik--><script type="text/javascript">var _paq = _paq || [];
 _paq.push(['trackPageView']);

@@ -54,17 +54,210 @@ html(lang="en")
                             In this tutorial, we will learn how to configure a local project in order to be ready to contribute to the official 
                             engine. Several things will be aborded: 
                         ul
-                            li The project code conventions
+                            li Create a Github account
                             li How to fork and clone a project
-                            li How to setup your local copy to compile the engine
+                            li How to setup your local copy to compile the engine with Visual Studio
+                            li The project code conventions
                             li How to create a new pull request   
                                                     
                         p. 
-                            I will use the awesome editor Visual Studio Code to edit, commit and push my changes on the repository. VSCode 
-                            <a href="https://code.visualstudio.com/">can be found here.</a> 
+                            I will use the awesome editor Visual Studio Code to edit and compile the project. VSCode 
+                            <a href="https://code.visualstudio.com/">can be found here.</a> Let's start!
                             
+                        h2 Git and Github
+                            
+                        p. 
+                            Babylon.js repository is located on Github. That means in order to contribute, you first have to create a free Github account.
+                            To do so, go to <a href="">github.com</a>, and fill the form with your account name, mail and password.
+                        .centerImg.centerImgSmall
+                            img(src="/img/contribute/github.jpg")
+                        p.
+                            Once your account is created and validated, you can browse to the <a href="https://github.com/BabylonJS/Babylon.js">project homepage</a>.
+                            On this page, you can find several information:
+                        .centerImg.centerImgBig
+                            img(src="/img/contribute/github2.jpg")
+                        p. 
+                            Let's  explain the top right buttons on this screen:
+                        ul
+                            li The button "Watch" is used to toggle changes notifications on this project.
+                            li The button "Star" is used to check the popularity of a project. You can give a star to Babylon.js if you want to help it spread around the world!
+                            li The button "Fork" is used to create your own local copy of this project.
+                            
+                        h2 How to fork and clone the project
+                            
+                        p.
+                            The first thing to do is to fork the project. Forking a project will create 
+                            your own copy of the project. That means you can do whatever you want in your copy of 
+                            Babylon.js without affecting the main repository :) Awesome right ? So let's fork Babylon.js.
+                      
+                        p.
+                            After the nice animation is finished, you probably noticed the name of the project changed.
+                        .centerImg.centerImgSmall
+                            img(src="/img/contribute/github3.jpg")
+                        p.
+                            That means you're in your local copy! Congrats :) Let's go to the next step.
+                            
+                        h2 Clone the project, and using the git command line
                         
+                        p.
+                            Back to your computer! Before doing anything, you have to setup the softwares listed below. This tutorial won't describe how to 
+                            install it, as it's veeeery easy to do it :)
+                        ul
+                            li <a target='_new' href="https://nodejs.org/en/">Node.js</a>
+                            li <a target='_new' href="https://git-scm.com/">Git</a>
+                            li <a target='_new' href="https://code.visualstudio.com/">Visual Studio</a>
+                            li Strongly recommended, but not mandatory: <a target='_new' href="http://cmder.net/">Cmder</a>
                             
+                        p.
+                            Open cmder (or your new git bash), and type the following command:
+                        pre
+                            code.bash.
+                                > node -v
+                                    v5.2.0
+                                > npm -v
+                                    v3.3.12
+                        p.
+                            Now, go to the directory you want to have your project, and type the clone command. Replace <i>Temechon</i> by your Github account name:
+                        pre
+                            code.bash.
+                                > git clone https://github.com/Temechon/Babylon.js.git
+                        p. 
+                            The whole project will be retrieved on your computer. Keep in mind you are retrieving your <i>fork</i> of the project, not 
+                            the official one.
+                        .centerImg
+                            img(src="/img/contribute/fork1.jpg")
+                        
+                        h2 Synchronize your fork with the official repo - Create an upstream link
+                                                  
+                        p. 
+                            An upstream link will help you retrieve all last changes from the official Babylon.js project.
+                            For this, we will follow <a target="_new" href="https://help.github.com/articles/configuring-a-remote-for-a-fork/">this github tutorial:</a>
+                        pre
+                            code.bash.
+                                > cd Babylon.js
+                                > git remote -v
+                                    origin  https://github.com/Temechon/Babylon.js.git (fetch)
+                                    origin  https://github.com/Temechon/Babylon.js.git (push)
+                                > git remote add upstream https://github.com/BabylonJS/Babylon.js.git
+                                > git remote -v
+                                    origin  https://github.com/Temechon/Babylon.js.git (fetch)
+                                    origin  https://github.com/Temechon/Babylon.js.git (push)
+                                    upstream        https://github.com/BabylonJS/Babylon.js.git (fetch)
+                                    upstream        https://github.com/BabylonJS/Babylon.js.git (push)
+                            
+                        h2 Fetch the very last version
+                        
+                        p.
+                            Ok! Now you're ready to retrieve all changes from the official repo. Each time you want to add a new feature, a bug fix, anything, you 
+                            have to ensure you are working on the very last version. 
+                            To do this, follow this <a target="_new" href="https://help.github.com/articles/syncing-a-fork/">Github tutorial</a>:
+                        pre
+                            code.bash.
+                                > git fetch upstream
+                                > git checkout master
+                                > git merge upstream/master
+                                
+                        p. 
+                            And you're done! Now, let's setup the IDE and try to compile the project.
+                            
+                        h2 Install packages
+                        
+                        p. 
+                            In order to be able to compile, you have to install all needed packages. For this, we use the power of Node Package Manager. 
+                            First, we install gulp globally (-g), and install all needed packages for this project:
+                        pre
+                            code.bash.
+                                > npm install -g gulp
+                                > cd Tools/Gulp
+                                > npm install
+                                
+                        p. 
+                            A lot of lines will be written... It may take a while, depending on your computer and the network speed. Go grab a coffee during this time :)
+                            
+                        h2 Setup Visual Studio Code 
+                        
+                        p.
+                            With VS Code, you can directly open the Babylon.js folder. Now we just have to configure the task runner of VSCode and we're done!
+                            
+                        h3 The task runner
+                        
+                        p.
+                            In order to configure the task runner, press CTRL+SHIFT+P, and type config. you should have this line highlighted. Press enter:
+                        .centerImg
+                            img(src="/img/contribute/vscode1.jpg")
+                        p. 
+                            The file <i>tasks.json</i> opens in edit mode. You can delete everything is paste this:
+                        pre
+                            code.json.
+                                {
+                                    "version": "0.1.0",
+                                    "command": "gulp",
+                                    "options": {
+                                        "cwd": "${workspaceRoot}/Tools/Gulp"
+                                    },
+                                    "isShellCommand": true,
+                                    "tasks": [
+                                        {
+                                            "taskName": "typescript",
+                                            // Make this the default build command.
+                                            "isBuildCommand": true
+                                        },
+                                        {
+                                            "taskName": "default",
+                                            "isBuildCommand": false
+                                        },
+                                        {
+                                            "taskName": "watch-typescript",
+                                            "isBuildCommand": false
+                                        }
+                                    ]
+                                }
+                        p.
+                            Save it. Now your VSCode is configured :) You can press CTRL+SHIFT+B in order to compile all TypeScript files.
+                            
+                        h2 The project code conventions
+                        
+                        p. 
+                            Now that you're ready to add your own code, please read and follow the 
+                            <a target="_new" href="http://doc.babylonjs.com/generals/Approved_Naming_Conventions">project code conventions.</a>
+                            If you don't follow these simple rules, your pull request may not be approved.
+                            
+                        h2 Commit and push
+                        
+                        p. 
+                            Once your new feature is developped and tested, you can commit and push to your repository.
+                            You can commit and push within VSCode, but you first have to tell him to remember your Github credentials. Otherwise, 
+                            the 'push' command will be stucked and will run forever.
+                            Open your cmder (or the git bash), and use this:
+                        pre
+                            code.bash
+                                > git config --global credential.helper wincred
+                                
+                        p. 
+                            <a target="_new" href="http://stackoverflow.com/questions/15381198/remove-credentials-from-git/15382950#15382950">You can learn more about it here.</a>
+                            
+                        p. 
+                            Back to VSCode! By clicking on the Git icon (on the left), you can see how many changes have been done on the repo.
+                            You can click on the '+' icon to stage them, and specify a commit message for each one of them. CTRL+Enter to commit.
+                            When every file has its commit message, clic on the push button.
+                            This will send all your modifications to <b>your fork.</b> Now, we have to send it to the official repository \o/
+                            
+                        h2 Create a pull request
+                        
+                        p.
+                            Everything happens on Github! Connect to your account, and go to your Babylon.js fork. Can you see this little greeny button over there?
+                            
+                        .centerImg.centerImgSmall
+                            img(src="/img/contribute/pr1.jpg")
+                        p.
+                            You can click on it. Github will show all change you want to push to the official repo. Check this, and if you are sure, click on the button 
+                            'Create Pull Request'. Leave a small message, and confirm.
+                            The pull request will be automatically be checked by Travis, and manually reviewed by Babylon.js team. We are very reactive, and a pull request never stay 
+                            uncommented for too long :)
+                            
+                        h2 Now what ?                            
+                        p. 
+                            Yay! You pushed a new feature in the official repository. You are now an official contributor! Congrats :)
                         
                             
         include ../../include/footer.jade

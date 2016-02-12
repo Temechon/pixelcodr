@@ -1,5 +1,6 @@
 .tutorial {
   font-family: $font-text;
+  margin-bottom:50px;
 
   p {
     text-align: justify;
@@ -16,7 +17,6 @@
     padding-bottom:20px;
     text-align:center;
   }
-
   .centerImg img {
     width:100%;
     max-width:400px;
@@ -25,6 +25,11 @@
     width:100%;
     max-width:700px;
   }
+  .centerImgSmall img {
+    width:100%;
+    max-width:200px;
+  }
+  
 
   h2 {
     font-family: $font-title;

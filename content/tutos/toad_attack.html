@@ -6,23 +6,22 @@
         <img src="/img/logos/html5.png" style="max-height:75px;" /><br/>
     </div>
     <p>
-        <a href="http://www.babylonjs.com/">Babylon.js</a> is a 3D game engine based on WebGL and javascript, created by David Catuhe and David Rousset.<br/>
-        This engine is relatively new and less popular than Three.js, but many think it is easier to understand and easier to manipulate
-        . Moreover, it is completely open source (with a very reactive community) and game oriented,
-        with several features built specifically for games, like <i>gamepad camera</i>, <i>hardware accelerated instances,</i> and so on.<br/>
-        The complete list of feature is described on the <a href="https://github.com/BabylonJS/Babylon.js">Github page</a> of the project.<br/>
-        With this framework, you can build games <a href="http://race.assassinscreedpirates.com/">like this one</a>, based on the popular licence <span class="purple">Assasin's creed</span>.
+        <a href="http://www.babylonjs.com/">Babylon.js</a> is a 3D game engine based on WebGL and javascript, created by
+        David Catuhe and David Rousset.<br/> This engine is relatively new and less popular than Three.js, but many think
+        it is easier to understand and easier to manipulate . Moreover, it is completely open source (with a very reactive
+        community) and game oriented, with several features built specifically for games, like <i>gamepad camera</i>, <i>hardware accelerated instances,</i>        and so on.<br/> The complete list of feature is described on the <a href="https://github.com/BabylonJS/Babylon.js">Github page</a>        of the project.<br/> With this framework, you can build games <a href="http://race.assassinscreedpirates.com/">like this one</a>,
+        based on the popular licence <span class="purple">Assasin's creed</span>.
     </p>
     <p>
-        To understand this tutorial, you don't have to have any experience in game development. I will try to explain with many details of what is done and how to do it.
-        However, having a small experience in Javascript is necessary.
+        To understand this tutorial, you don't have to have any experience in game development. I will try to explain with many details
+        of what is done and how to do it. However, having a small experience in Javascript is necessary.
     </p>
 
     <h2>How it works</h2>
     <p>
-        It's the power of WebGL: thanks to a new HTML5 element (canvas), your browser can access to the computer GPU,
-        allowing complex operations to be displayed, like 3D elements.<br/>
-        Babylon.js is a wrapper for all these operations (called a 3D engine), and the GPU can be used without doing anything from the developer !
+        It's the power of WebGL: thanks to a new HTML5 element (canvas), your browser can access to the computer GPU, allowing complex
+        operations to be displayed, like 3D elements.<br/> Babylon.js is a wrapper for all these operations (called
+        a 3D engine), and the GPU can be used without doing anything from the developer !
     </p>
 
     <h2>What you will create</h2>
@@ -35,14 +34,13 @@
             <li>Handle keyboard events</li>
             <li>Basic animations</li>
         </ul>
-    The part 1 will cover the two first points.
-    This game will be called <a href="game/index.html">TOAD ATTACK - click here to run the game</a>, and will look like this :
+        The part 1 will cover the two first points. This game will be called <a href="game/index.html">TOAD ATTACK - click here to run the game</a>,
+        and will look like this :
         <div class="centerImg centerImgBig">
             <a href="game/index.html"><img src="img/final.png" /></a>
         </div>
-    It will be a very simple game, working like the famous Rock Band licence : few mushrooms will walk along 3 lanes, and the player
-    will have to press the key corresponding to each lane to kill the mushroom on the red platform.<br/>
-    But first, let's start by installing the tools you will need !
+        It will be a very simple game, working like the famous Rock Band licence : few mushrooms will walk along 3 lanes, and the
+        player will have to press the key corresponding to each lane to kill the mushroom on the red platform.<br/>        But first, let's start by installing the tools you will need !
     </p>
 
     <h2>The tools</h2>
@@ -50,20 +48,22 @@
         Only three softwares are mandatory :
         <ul>
             <li>a text editor (Sublime Text, Notepad++, Atom, Visual Studio Web,...)</li>
-            <li>A web browser supporting WebGL ( a complete list <a href="http://caniuse.com/webgl">here</a>). The last version of Chrome/Firefox/IE is perfect :)</li>
-            <li>A web server to load all our game assets.
-                You can either install <a href="http://www.wampserver.com/">WAMP</a> for Windows (or
+            <li>A web browser supporting WebGL ( a complete list <a href="http://caniuse.com/webgl">here</a>). The last version
+                of Chrome/Firefox/IE is perfect :)</li>
+            <li>A web server to load all our game assets. You can either install <a href="http://www.wampserver.com/">WAMP</a>                for Windows (or
                 <a href="http://www.mamp.info/en/">MAMP</a> for Mac), or use the public folder of your DropBox account.</li>
         </ul>
-    The webserver is necessary because we will load several external resources in our game : textures, custom 3D models, ...
-    All these resources are loaded via XHR (it's a common practice), and for security reasons XHR does not work offline (cross-origin requests not allowed).
-    There <i>is</i> a way to work without a webserver, but I will explain it on another tutorial :)
+        The webserver is necessary because we will load several external resources in our game : textures, custom 3D models, ...
+        All these resources are loaded via XHR (it's a common practice), and for security reasons XHR does not work offline
+        (cross-origin requests not allowed). There <i>is</i> a way to work without a webserver, but I will explain
+        it on another tutorial :)
     </p>
 
     <h2>The beginning</h2>
     <p>
-        Once you choose your tools and your webserver is ready, create a folder <span class="purple">toad_attack</span> in your webserver directory. This folder will be your 'work' folder.
-        Then, create these folders in your work directory :
+        Once you choose your tools and your webserver is ready, create a folder <span class="purple">toad_attack</span> in
+        your webserver directory. This folder will be your 'work' folder. Then, create these folders in your work directory
+        :
         <ul>
             <li><span class="purple">assets</span> - contains all our games assets</li>
             <li><span class="purple">css</span> - contains the css or our website</li>
@@ -71,15 +71,17 @@
         </ul>
 
         Finally, you will have to download the last version of Babylon.js on the <a href="https://github.com/BabylonJS/Babylon.js">Github project page</a>.
-        Get the project zip, and extract the file <code>babylon.1.12.js</code> in the folder <code>/toad_attack/js</code>.Voila ! You're ready to code :)
+        Get the project zip, and extract the file <code>babylon.1.12.js</code> in the folder <code>/toad_attack/js</code>.Voila
+        ! You're ready to code :)
 
     </p>
 
     <h2>The HTML page</h2>
     <p>
-    The HTML page is really simple, as everything is done in Javascript. The only important element is <code>&lt;canvas&gt;</code>, which represents our game.
+        The HTML page is really simple, as everything is done in Javascript. The only important element is <code>&lt;canvas&gt;</code>,
+        which represents our game.
 
-<pre><code class="html">&lt;!DOCTYPE html&gt;
+        <pre><code class="html">&lt;!DOCTYPE html&gt;
 &lt;head&gt;
     &lt;link rel=&quot;stylesheet&quot; type=&quot;text/css&quot; href=&quot;css/style.css&quot; /&gt;
         &lt;script src=&quot;js/babylon.1.12.js&quot;&gt;&lt;/script&gt;
@@ -89,15 +91,13 @@
     &lt;canvas id=&quot;renderCanvas&quot;&gt;&lt;/canvas&gt;
 &lt;/body&gt;
 &lt;/html&gt;
-</code></pre>
-
-    Save this in a file called <span class="purple">index.html</span> at the root of your work folder.
+</code></pre> Save this in a file called <span class="purple">index.html</span> at the root of your work folder.
     </p>
 
     <h2>The CSS page</h2>
     <p>
-    The css file is very simple too. Nothing fancy here, the canvas is just configured to take all the windows width and height.
-<pre><code class="css">html, body {
+        The css file is very simple too. Nothing fancy here, the canvas is just configured to take all the windows width and height.
+        <pre><code class="css">html, body {
     height: 100%;
     width: 100%;
     padding: 0;
@@ -111,8 +111,7 @@
     margin: 0;
     padding: 0;
 }
-</code></pre>
-    Save this code in a file <code>css/style.css</code>.
+</code></pre> Save this code in a file <code>css/style.css</code>.
     </p>
 
     <p>
@@ -122,9 +121,9 @@
     <h2>The Babylon.js magic</h2>
 
     <p>
-        Creates a new file in the <code>js</code> folder called <code>initScene.js</code>. Open this file in your favorite text
-        editor and copy-paste this code :
-<pre><code class="js">// Global variables
+        Creates a new file in the <code>js</code> folder called <code>initScene.js</code>. Open this file in your favorite
+        text editor and copy-paste this code :
+        <pre><code class="js">// Global variables
 var canvas, engine, scene, camera, score = 0;
 var TOAD_MODEL;
 
@@ -166,30 +165,29 @@ function initScene() {
 
     <h2>What ? </h2>
     <p>
-    This code is easy to read, but let's explain it step by step.
+        This code is easy to read, but let's explain it step by step.
 
-<pre><code class="js">// Global variables
+        <pre><code class="js">// Global variables
 var canvas, engine, scene, camera, score = 0;
 var TOAD_MODEL;
 var ENDINGS = [];
 var ENEMIES = [];
-</code></pre>
-    Here, several global variables are created. These variables will contain a reference to :
-    <ul>
-        <li>the canvas (our html5 game element),</li>
-        <li>the Babylon engine (responsible for drawing the game scene on the canvas)</li>
-        <li>the game scene (contains our game elements) </li>
-        <li>the game camera.</li>
-        <li>the score</li>
-    </ul>
-    A game can contains several different scenes (for example a scene of a city with a lot of buildings, and a scene of the inside of one building),
-    but only one engine is necessary to display your game.<br/>
-    Same, several cameras can be created to display several point of views. In our game, we only need one.<br/>
-    The array <code>ENDING</code> will contains an object representing the end of the lane.
+</code></pre> Here, several global variables are created. These variables will contain a reference to :
+        <ul>
+            <li>the canvas (our html5 game element),</li>
+            <li>the Babylon engine (responsible for drawing the game scene on the canvas)</li>
+            <li>the game scene (contains our game elements) </li>
+            <li>the game camera.</li>
+            <li>the score</li>
+        </ul>
+        A game can contains several different scenes (for example a scene of a city with a lot of buildings, and a scene of the inside
+        of one building), but only one engine is necessary to display your game.<br/> Same, several cameras can be
+        created to display several point of views. In our game, we only need one.<br/> The array <code>ENDING</code> will
+        contains an object representing the end of the lane.
     </p>
 
     <p>
-<pre><code class="js">/**
+        <pre><code class="js">/**
 * Load the scene when the canvas is fully loaded
 */
 document.addEventListener("DOMContentLoaded", function () {
@@ -197,61 +195,52 @@ document.addEventListener("DOMContentLoaded", function () {
         initScene();
     }
 }, false);
-</code></pre>
-    The event <code>DOMContentLoaded</code> is fired by the browser when the HTML is loaded. We need this in order to have a fully loaded canvas element to create
-    the Babylon engine. If you forget it, you will have the error <code>Uncaught Error: WebGL not supported </code>.<br/>
-    In the callback function, we are testing if a Babylon engine can be created with the client browser (actually if the browser supports WebGL). In this case, the method <code>initScene</code> is called.
+</code></pre> The event <code>DOMContentLoaded</code> is fired by the browser when the HTML is loaded. We need this in order to
+        have a fully loaded canvas element to create the Babylon engine. If you forget it, you will have the error <code>Uncaught Error: WebGL not supported </code>.<br/>        In the callback function, we are testing if a Babylon engine can be created with the client browser (actually if
+        the browser supports WebGL). In this case, the method <code>initScene</code> is called.
     </p>
 
     <p>
-<pre><code class="js">// Get canvas
+        <pre><code class="js">// Get canvas
 canvas = document.getElementById("renderCanvas");
 
 // Create babylon engine
 engine = new BABYLON.Engine(canvas, true);
-</code></pre>
-
-    The canvas element is retrieved and a Babylon engine is created for this canvas. The second parameter <code>true</code> is to activate the game antialiasing.
+</code></pre> The canvas element is retrieved and a Babylon engine is created for this canvas. The second parameter <code>true</code>        is to activate the game antialiasing.
     </p>
 
     <p>
-<pre><code class="js">// Create scene
+        <pre><code class="js">// Create scene
 scene = new BABYLON.Scene(engine);
-</code></pre>
-    A scene is created (and will be populated later).
+</code></pre> A scene is created (and will be populated later).
     </p>
 
     <p>
-<pre><code class="js">// Create the camera
+        <pre><code class="js">// Create the camera
 camera = new BABYLON.FreeCamera("camera", new BABYLON.Vector3(0,4,-10), scene);
 camera.setTarget(new BABYLON.Vector3(0,0,10));
 camera.attachControl(canvas);
-</code></pre>
-    A camera is created (to 'see' our scene) at the position (0,4,-10) and its target is set to the point (0,0,10).<br/>
-    There are several types of camera in Babylon.js. A FreeCamera is the camera available in most of FPS games: controlled with keyboard arrows and the mouse.
-    These controls are activated by the function <code>attackControl()</code>.<br/>
-    A comprehensive list of cameras is described <a href="https://github.com/BabylonJS/Babylon.js/wiki/05-Cameras">here</a>.
+</code></pre> A camera is created (to 'see' our scene) at the position (0,4,-10) and its target is set to the point (0,0,10).<br/>        There are several types of camera in Babylon.js. A FreeCamera is the camera available in most of FPS games: controlled
+        with keyboard arrows and the mouse. These controls are activated by the function <code>attackControl()</code>.<br/>        A comprehensive list of cameras is described <a href="https://github.com/BabylonJS/Babylon.js/wiki/05-Cameras">here</a>.
     </p>
 
     <p>
-<pre><code class="js">// Create light
+        <pre><code class="js">// Create light
 var light = new BABYLON.PointLight("light", new BABYLON.Vector3(0,5,-5), scene);
-</code></pre>
-    A light is mandatory in our scene to actually see something. If you forget the light, all objects will be dark.<br/>
-    Such as cameras, there are several types of camera in Babylon.
-    A comprehensive list of lights is described <a href="https://github.com/BabylonJS/Babylon.js/wiki/06-Lights">here</a>.
+</code></pre> A light is mandatory in our scene to actually see something. If you forget the light, all objects will be dark.<br/>        Such as cameras, there are several types of camera in Babylon. A comprehensive list of lights is described <a href="https://github.com/BabylonJS/Babylon.js/wiki/06-Lights">here</a>.
     </p>
 
     <p>
         If you try to open <code>index.html</code> in your browser, you will see... nothing. And it's totally normal.
     </p>
 
-<h2>I want to see dammit !</h2>
+    <h2>I want to see dammit !</h2>
 
     <p>
-        Relax, here it comes :) What I didn't tell you is Babylon needs one last function in order to display anything : the render function.<br/>
-        Add this function at the end of the <code>initScene</code> function and run index.html in your browser :
-<pre><code class="js">engine.runRenderLoop(function () {
+        Relax, here it comes :) What I didn't tell you is Babylon needs one last function in order to display anything : the render
+        function.<br/> Add this function at the end of the <code>initScene</code> function and run index.html in
+        your browser :
+        <pre><code class="js">engine.runRenderLoop(function () {
     scene.render();
 }
 </code></pre>
@@ -259,40 +248,38 @@ var light = new BABYLON.PointLight("light", new BABYLON.Vector3(0,5,-5), scene);
     </p>
     <h2>Yeah, purple everywhere !</h2>
     <p>
-       You should see a purple screen, with nothing inside. It's ok, because we didn't created anything in our scene !<br/>
-        The render function is a function called by the 3D engine to <span class="purple">draw our scene 60 times by seconds</span>.
-        Each <code>render</code> call draws a frame, so our game will run at 60 frames per seconds (60 FPS).
-        The more code you will add in this function, the more time a frame will be displayed, and lags could be appears.
+        You should see a purple screen, with nothing inside. It's ok, because we didn't created anything in our scene !<br/>        The render function is a function called by the 3D engine to <span class="purple">draw our scene 60 times by seconds</span>.
+        Each <code>render</code> call draws a frame, so our game will run at 60 frames per seconds (60 FPS). The more code
+        you will add in this function, the more time a frame will be displayed, and lags could be appears.
     </p>
 
-<h2>A simple sphere</h2>
+    <h2>A simple sphere</h2>
 
     <p>Now that you understand the basics of a 3D game (a scene, a camera, a light and a render function), let's create a simple
-    object : a sphere. Babylon makes it super easy with only one line of code. Create a new function called <code>initGame</code> :
-<pre><code class="js">/**
+        object : a sphere. Babylon makes it super easy with only one line of code. Create a new function called <code>initGame</code>        :
+        <pre><code class="js">/**
  * Initialize the game
  */
 function initGame() {
     BABYLON.Mesh.CreateSphere("sphere", 10, 1, scene);
 }
-</code></pre>
-    And updates the <code>onload</code> function to launch <code>initGame</code> by adding :
-<pre><code class="js">initGame();</code></pre>
-    Run index.html in your browser, and you should see a sphere in the center of your screen. You can even move the camera with keyboard arrows.
-    <div class="centerImg"><img src="img/toad_attack1.png"></div>
+</code></pre> And updates the <code>loadGame</code> function to launch <code>initGame</code> by adding :
+        <pre><code class="js">initGame();</code></pre> Run index.html in your browser, and you should see a sphere in the center of your screen. You can even move the
+        camera with keyboard arrows.
+        <div class="centerImg"><img src="img/toad_attack1.png"></div>
     </p>
 
     <p>
-        Babylon can create <a href="https://github.com/BabylonJS/Babylon.js/wiki/02-Basic-elements">several</a> basic elements, such as Box, Torus, planes, ...
-        As an exercise, you can try to create all these simple objects in your scene.
+        Babylon can create <a href="https://github.com/BabylonJS/Babylon.js/wiki/02-Basic-elements">several</a> basic elements,
+        such as Box, Torus, planes, ... As an exercise, you can try to create all these simple objects in your scene.
     </p>
 
-<h2>We need to go deeper</h2>
+    <h2>We need to go deeper</h2>
 
-<p>
-    Clean your function <code>initGame</code> and replace it with this :
+    <p>
+        Clean your function <code>initGame</code> and replace it with this :
 
-<pre><code class="js">function initGame() {
+        <pre><code class="js">function initGame() {
 
     // Number of lanes
     var LANE_NUMBER = 3;
@@ -333,24 +320,24 @@ function initGame() {
     // Adjust camera position
     camera.position.x = LANES_POSITIONS[Math.floor(LANE_NUMBER/2)];
 }
-</code></pre>
-    Here, two functions are created :
-    <ul>
-        <li>The function <code>createLane</code> creates a box scales by 800 along the z-axis. This function will be called 3 times (for each lane).</li>
-        <li>The function <code>createEnding</code> creates a red plane. The code creating the red material is this one :
-<pre><code class="js">var mat = new BABYLON.StandardMaterial(&quot;endingMat&quot;, scene);
+</code></pre> Here, two functions are created :
+        <ul>
+            <li>The function <code>createLane</code> creates a box scales by 800 along the z-axis. This function will be called
+                3 times (for each lane).</li>
+            <li>The function <code>createEnding</code> creates a red plane. The code creating the red material is this one :
+                <pre><code class="js">var mat = new BABYLON.StandardMaterial(&quot;endingMat&quot;, scene);
 mat.diffuseColor = new BABYLON.Color3(0.8,0.2,0.2);
-</code></pre></li>
-    </ul>
-    These two functions are then called in a for loop 3 times.<br/>
-    Finally, the camera position is adjusted to be at the top of the middle lane.
-    Here is what should be displayed :
-    <div class="centerImg centerImgBig"><img src="img/toad_attack2.png"></div>
+</code></pre>
+            </li>
+        </ul>
+        These two functions are then called in a for loop 3 times.<br/> Finally, the camera position is adjusted to be at
+        the top of the middle lane. Here is what should be displayed :
+        <div class="centerImg centerImgBig"><img src="img/toad_attack2.png"></div>
 
-   By the way, if you want to update the lane positions (or shapes), you should know that Babylon.js is a <span class="purple">left-handed coordinate system</span> : the z-axis is in front of you, y-axis on the top and x-axis on the right.
-    <div class="centerImg"><img src="img/rightandleftsystem.jpg"></div>
-    Now that our scene is up and ready, let's add some mushrooms !
-</p>
+        By the way, if you want to update the lane positions (or shapes), you should know that Babylon.js is a <span class="purple">left-handed coordinate system</span>        : the z-axis is in front of you, y-axis on the top and x-axis on the right.
+        <div class="centerImg"><img src="img/rightandleftsystem.jpg"></div>
+        Now that our scene is up and ready, let's add some mushrooms !
+    </p>
     <div class="centerImg">
         <p><a href="toad_attack-2.html">Ready for PART 2 ? </a></p>
     </div>
